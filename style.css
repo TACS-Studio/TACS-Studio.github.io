@@ -1,0 +1,430 @@
+/* ============================================
+   全局变量与基础重置
+   ============================================ */
+:root {
+    /* 主题色 */
+    --primary: #1677ff;
+    --primary-hover: #1568c8;
+    --primary-active: #1258a8;
+
+    /* 浅色模式色板 */
+    --bg-page: #f7f8fa;
+    --bg-card: #ffffff;
+    --bg-sub: #f7f8fa;
+    --bg-input: #f7f8fa;
+    --bg-input-focus: #ffffff;
+    --text-primary: #111;
+    --text-secondary: #666;
+    --text-tertiary: #888;
+    --border-base: #e5e5e5;
+    --border-input: #ddd;
+    --code-bg: #f5f5f5;
+
+    /* 阴影与圆角 */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-nav: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 18px;
+    --radius-full: 22px;
+
+    /* 动画时长 */
+    --transition-fast: 0.2s;
+    --transition-base: 0.3s;
+}
+
+/* 深色模式色板统一管理 */
+body.dark {
+    --bg-page: #1e1e1e;
+    --bg-card: #121212;
+    --bg-sub: #272727;
+    --bg-input: #2a2a2a;
+    --bg-input-focus: #2a2a2a;
+    --text-primary: #eee;
+    --text-secondary: #aaa;
+    --text-tertiary: #888;
+    --border-base: #333;
+    --border-input: #444;
+    --code-bg: #2d2d2d;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-nav: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --primary: #4096ff;
+}
+
+/* 全局盒模型重置 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================================
+   页面基础布局
+   ============================================ */
+html {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable both-edges;
+    /* Firefox 滚动条兼容 */
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
+
+body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    transition: background var(--transition-base), color var(--transition-base);
+    /* 字体渲染优化 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   滚动条样式（全浏览器兼容）
+   ============================================ */
+html::-webkit-scrollbar {
+    width: 6px;
+    background: transparent;
+}
+
+html::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+html::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+body.dark html::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+body.dark html::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* ============================================
+   顶部导航栏
+   ============================================ */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 0 16px;
+    /* 硬件加速，减少滚动重绘 */
+    transform: translateZ(0);
+    transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.menu,
+.git-link {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: var(--primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.menu {
+    left: 16px;
+}
+
+.git-link {
+    right: 16px;
+}
+
+.git-link:hover {
+    color: var(--primary-hover);
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+/* ============================================
+   侧边下拉菜单
+   ============================================ */
+nav {
+    position: fixed;
+    top: 56px;
+    left: 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-nav);
+    overflow: hidden;
+    z-index: 11;
+    min-width: 160px;
+    display: none;
+    transition: background var(--transition-base), box-shadow var(--transition-base);
+}
+
+nav.show {
+    display: block;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    font-size: 15px;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.item:hover {
+    background: var(--bg-sub);
+    color: var(--primary);
+}
+
+.item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.item i {
+    width: 20px;
+    font-size: 17px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sub {
+    display: none;
+    background: var(--bg-sub);
+    transition: background var(--transition-base);
+}
+
+.sub.open {
+    display: block;
+}
+
+.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* ============================================
+   主内容区
+   ============================================ */
+main {
+    min-height: 100vh;
+    padding: 72px 16px 80px;
+    overflow-y: visible;
+    background: transparent;
+}
+
+/* ============================================
+   消息气泡公共样式
+   ============================================ */
+.msg {
+    margin: 12px 0;
+    padding: 12px 16px;
+    border-radius: var(--radius-xl);
+    line-height: 1.6;
+    font-size: 15px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* 用户消息 */
+.user {
+    background: var(--primary);
+    color: #fff;
+    margin-left: auto;
+    margin-right: 0;
+    border-bottom-right-radius: var(--radius-sm);
+    max-width: 70%;
+    width: fit-content;
+    text-align: left;
+}
+
+/* AI回复与思考公共样式 */
+.ai,
+.think {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    margin-right: auto;
+    margin-left: 0;
+    border-bottom-left-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    max-width: 100%;
+    width: 100%;
+    transition: background var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+}
+
+/* 思考状态独有样式 */
+.think {
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.tip {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+}
+
+/* ============================================
+   Markdown 内容渲染
+   ============================================ */
+.ai h1,
+.ai h2,
+.ai h3 {
+    margin: 10px 0 6px;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.ai p {
+    margin: 8px 0;
+}
+
+.ai ul,
+.ai ol {
+    padding-left: 22px;
+    margin: 8px 0;
+}
+
+.ai code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.ai pre {
+    background: #1e1e1e;
+    color: #dcdcdc;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: 10px 0;
+}
+
+.ai pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+.ai blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 12px;
+    margin: 10px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* ============================================
+   底部输入栏
+   ============================================ */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-base);
+    display: flex;
+    align-items: center;
+    transform: translateZ(0);
+    transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+footer input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-full);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+    margin-right: 12px;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+footer input:focus {
+    border-color: var(--primary);
+    background: var(--bg-input-focus);
+}
+
+#send {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+}
+
+#send i {
+    font-size: 18px;
+}
+
+#send:hover {
+    background: var(--primary-hover);
+}
+
+#send:active {
+    background: var(--primary-active);
+}
+
+/* 键盘聚焦无障碍样式 */
+#send:focus-visible,
+.menu:focus-visible,
+.item:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}

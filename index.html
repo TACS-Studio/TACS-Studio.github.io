@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Chat | TACS Studio - Free Multi-Model AI Chat Tool</title>
+    <meta name="description" content="Free online AI chat tool developed by TACS Studio. Support Spark, GLM, Quark large language models, custom AI system role, dark mode, Markdown rendering, fully mobile responsive.">
+    <meta name="keywords" content="AI Chat, free ai chatbot, Spark LLM, GLM AI, Quark model, custom system prompt, dark mode, online AI conversation">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="TACS Studio">
+
+    <!-- DNS预解析 加速CDN -->
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+    <!-- 多语言跳转标准hreflang -->
+    <link rel="alternate" hreflang="en" href="index.html">
+    <link rel="alternate" hreflang="zh-CN" href="zh.cn.html">
+    <link rel="alternate" hreflang="zh-TW" href="zh.tw.html">
+
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+
+    <!-- 移动端PWA配置 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Open Graph 社交分享 -->
+    <meta property="og:site_name" content="AI Chat by TACS Studio">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="AI Chat | TACS Studio - Free Multi-Model AI Chat">
+    <meta property="og:description" content="Online free AI chat supporting Spark, GLM, Quark, customizable AI role, dark theme and Markdown output.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+</head>
+<body
+    data-think="Thinking..."
+    data-error="An error occurred, please try again later."
+    data-tip="AI-generated content is for reference only."
+    data-role-prompt="Enter a custom global AI persona (clear and save to restore free conversation):"
+    data-role-cleared="Global persona cleared. Restored free, unrestricted conversation."
+    data-role-saved="Custom persona saved. It will apply automatically to future conversations.">
+
+    <header aria-label="Site header navigation">
+        <button type="button" class="menu" id="menuBtn" aria-label="Open sidebar menu">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <div class="logo">AI Chat</div>
+        <a href="https://github.com/TACS-Studio/tacs-studio.github.io" target="_blank" rel="noopener noreferrer" class="git-link" aria-label="Visit GitHub repository">
+            <i class="fa-brands fa-github" aria-hidden="true"></i>
+        </a>
+    </header>
+
+    <nav class="drop" id="drop" aria-label="Function sidebar menu">
+        <div class="item" id="darkToggle" role="button" tabindex="0">
+            <i class="fa-solid fa-moon" aria-hidden="true"></i>
+            <span>Dark Mode</span>
+        </div>
+        <div class="item" id="langOpen" role="button" tabindex="0">
+            <i class="fa-solid fa-language" aria-hidden="true"></i>
+            <span>Language</span>
+        </div>
+        <div class="sub" id="List1">
+            <div class="item active">English</div>
+            <a href="zh.cn.html" class="item">Simplified Chinese</a>
+            <a href="zh.tw.html" class="item">Traditional Chinese</a>
+        </div>
+        <div class="item" id="modelOpen" role="button" tabindex="0">
+            <i class="fa-solid fa-brain" aria-hidden="true"></i>
+            <span>Select Model</span>
+        </div>
+        <div class="sub" id="List2">
+            <div class="item active" data-key="glm">GLM</div>
+            <div class="item" data-key="spark">Spark</div>
+            <div class="item" data-key="quark">Quark</div>
+            <a class="item" href="web/draw.html">Draw</a>
+        </div>
+        <div class="item" id="setRoleBtn" role="button" tabindex="0">
+            <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+            <span>Custom Role</span>
+        </div>
+        <div class="item">
+            <a href="https://tacs-studio.github.io/about" target="_blank" rel="noopener noreferrer" aria-label="About the developer">
+                <i class="fa-solid fa-user" aria-hidden="true"></i>
+                <span>About Me</span>
+            </a>
+        </div>
+        <div class="item" id="notesOpen" role="button" tabindex="0">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span>Usage Notes</span>
+        </div>
+        <div class="sub" id="List3">
+            <div class="item active">AI-generated content is for reference only; use your independent judgment.</div>
+            <div class="item">Do not enter sensitive personal information or private data.</div>
+            <div class="item">Models have different capabilities; switch based on your scenario.</div>
+        </div>
+    </nav>
+
+    <main id="chat" aria-label="AI chat message container"></main>
+
+    <footer aria-label="Message input area">
+        <input type="text" id="input" placeholder="Type your message..." aria-label="Input chat message">
+        <button type="button" class="send" id="send" aria-label="Send message">
+            <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+        </button>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

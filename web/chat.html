@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Chat | TACS Studio</title>
+    <meta name="description" content="Minimal lightweight AI chat page powered by GLM large language model, support markdown rendering, dark mode.">
+    <meta name="keywords" content="minimal ai chat, glm llm, lightweight chatbot">
+    <meta name="author" content="TACS Studio">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://api.52vmy.cn">
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+</head>
+<body>
+<header aria-label="Page header">
+    <a class="logo" href="../" aria-label="Back to homepage">AI Chat</a>
+</header>
+<main id="chat" aria-label="AI chat message container"></main>
+<footer aria-label="Message input area">
+    <input type="text" id="input" placeholder="Type your message..." aria-label="Input chat message">
+    <button type="button" id="send" aria-label="Send message">↑</button>
+</footer>
+
+<script>
+(function () {
+    'use strict';
+    // 工具函数 HTML转义防XSS
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+    // 本地存储容错封装
+    const storage = {
+        get(key, def = '') {
+            try { return localStorage.getItem(key) || def; } catch { return def; }
+        }
+    };
+    // DOM缓存
+    const dom = {
+        body: document.body,
+        chat: document.getElementById('chat'),
+        input: document.getElementById('input'),
+        send: document.getElementById('send')
+    };
+    // 全局状态
+    const state = {
+        isRequesting: false,
+        typingTimer: null
+    };
+
+    // 初始化深色模式（修复原代码darkToggle不存在报错）
+    if (storage.get('darkMode') === "on") {
+        dom.body.classList.add("dark");
+    }
+
+    function scrollBottom() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    function sendMsg() {
+        const rawText = dom.input.value.trim();
+        if (!rawText || state.isRequesting) return;
+
+        // 上锁防止重复提交
+        state.isRequesting = true;
+        dom.send.disabled = true;
+        // 清除上一次未结束打字动画
+        if (state.typingTimer) {
+            clearInterval(state.typingTimer);
+            state.typingTimer = null;
+        }
+
+        dom.input.value = "";
+        // 用户消息（转义）
+        const userMsg = document.createElement('div');
+        userMsg.className = 'msg user';
+        userMsg.textContent = rawText;
+        dom.chat.appendChild(userMsg);
+        scrollBottom();
+
+        // 思考提示
+        const thinkingMessage = document.createElement('div');
+        thinkingMessage.className = 'msg think';
+        thinkingMessage.textContent = 'Thinking...';
+        dom.chat.appendChild(thinkingMessage);
+        scrollBottom();
+
+        const prompt = encodeURIComponent(rawText);
+        fetch(`https://api.52vmy.cn/api/chat/glm?msg=${prompt}`)
+            .then(res => res.json())
+            .then(data => {
+                const aiFullMarkdown = data.data?.answer || "Sorry, due to restrictions, please try again later.";
+                thinkingMessage.remove();
+
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'msg ai';
+                dom.chat.appendChild(aiMessageDiv);
+                scrollBottom();
+
+                let currentText = "";
+                let index = 0;
+                state.typingTimer = setInterval(() => {
+                    if (index < aiFullMarkdown.length) {
+                        currentText += aiFullMarkdown.charAt(index);
+                        const tip = escapeHtml("AI-generated content is for reference only.");
+                        aiMessageDiv.innerHTML = `<div class="tip">${tip}</div>` + marked.parse(currentText);
+                        scrollBottom();
+                        index++;
+                    } else {
+                        clearInterval(state.typingTimer);
+                        state.typingTimer = null;
+                    }
+                }, 10);
+            })
+            .catch(err => {
+                console.error('Fetch Error:', err);
+                thinkingMessage.remove();
+                const tip = escapeHtml("AI-generated content is for reference only.");
+                const errText = escapeHtml("An error occurred, please try again later.");
+                dom.chat.innerHTML += `<div class="msg ai">
+                    <div class="tip">${tip}</div>
+                    ${errText}
+                </div>`;
+                scrollBottom();
+            })
+            .finally(() => {
+                // 解锁
+                state.isRequesting = false;
+                dom.send.disabled = false;
+                dom.input.focus();
+            });
+    }
+
+    // 发送按钮点击
+    dom.send.addEventListener('click', sendMsg);
+    // 回车发送 Shift+Enter换行
+    dom.input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMsg();
+        }
+    });
+})();
+</script>
+</body>
+</html>

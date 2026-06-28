@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Draw | TACS Studio</title>
+    <meta name="description" content="Minimal lightweight AI image drawing page, generate artwork from text prompts.">
+    <meta name="keywords" content="ai draw, text to image, pollinations ai, lightweight art generator">
+    <meta name="author" content="TACS Studio">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="dns-prefetch" href="https://image.pollinations.ai">
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        img {
+            width: 100%;
+            max-width: 512px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        img:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<header aria-label="Page header">
+    <a class="logo" href="../" aria-label="Back to homepage">AI Draw</a>
+</header>
+<main id="chat" aria-label="AI generated message container"></main>
+<footer aria-label="Prompt input area">
+    <input type="text" id="input" placeholder="Enter your drawing prompt, e.g. anime girl, starry background..." aria-label="Input drawing prompt">
+    <button type="button" id="send" aria-label="Submit drawing prompt">↑</button>
+</footer>
+
+<script>
+(function () {
+    'use strict';
+
+    // 工具函数 HTML转义 防止XSS注入
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // 本地存储容错封装
+    const storage = {
+        get(key, def = '') {
+            try { return localStorage.getItem(key) || def; } catch { return def; }
+        }
+    };
+
+    // DOM缓存 只查询一次
+    const dom = {
+        body: document.body,
+        sendBtn: document.getElementById("send"),
+        input: document.getElementById("input"),
+        chatBox: document.getElementById("chat")
+    };
+
+    // 全局状态锁 防止重复提交
+    const state = {
+        isGenerating: false
+    };
+
+    // 初始化深色模式（修复原代码 darkToggle 不存在报错）
+    if (storage.get('darkMode') === "on") {
+        dom.body.classList.add("dark");
+    }
+
+    function scrollBottom() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    function generateImage() {
+        const rawPrompt = dom.input.value.trim();
+        if (!rawPrompt || state.isGenerating) return;
+
+        // 上锁
+        state.isGenerating = true;
+        dom.sendBtn.disabled = true;
+
+        dom.input.value = "";
+        // 用户提示词（转义防XSS）
+        const userMsg = document.createElement("div");
+        userMsg.className = "msg user";
+        userMsg.textContent = rawPrompt;
+        dom.chatBox.appendChild(userMsg);
+        scrollBottom();
+
+        // 加载提示
+        const loadingDom = document.createElement("div");
+        loadingDom.className = "think";
+        loadingDom.textContent = "Drawing...";
+        dom.chatBox.appendChild(loadingDom);
+        scrollBottom();
+
+        const seed = Math.floor(Math.random() * 100) + 1;
+        const encodedPrompt = encodeURIComponent(rawPrompt);
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}`;
+
+        const img = new Image();
+        img.alt = "AI Generated Artwork";
+
+        img.onload = () => {
+            loadingDom.remove();
+            const aiBox = document.createElement("div");
+            aiBox.className = "msg ai";
+
+            const tipText = escapeHtml("AI-generated content is for reference only.");
+            const clickTip = escapeHtml("Click the image to open original in new tab");
+            const safePrompt = escapeHtml(rawPrompt);
+            const safeSeed = escapeHtml(String(seed));
+            const safeImgUrl = escapeHtml(imgUrl);
+
+            aiBox.innerHTML = `
+                <div class="tip">${tipText}</div>
+                <div>Prompt: <b>${safePrompt}</b> | Seed: <b>${safeSeed}</b></div>
+                <img src="${safeImgUrl}" alt="AI Generated Art" onclick="window.open('${safeImgUrl}', '_blank')">
+                <div class="tip">${clickTip}</div>
+            `;
+            dom.chatBox.appendChild(aiBox);
+            scrollBottom();
+        };
+
+        img.onerror = () => {
+            loadingDom.remove();
+            const errText = escapeHtml("Image generation failed, please change your prompt and try again");
+            const tipText = escapeHtml("AI-generated content is for reference only.");
+            dom.chatBox.innerHTML += `<div class="msg ai">
+                <div class="tip">${tipText}</div>
+                ${errText}
+            </div>`;
+            scrollBottom();
+        };
+
+        img.src = imgUrl;
+
+        // 解锁
+        img.onload = function() {
+            state.isGenerating = false;
+            dom.sendBtn.disabled = false;
+            dom.input.focus();
+            // 原有onload逻辑
+            const loadingDom = document.querySelector(".think");
+            if(loadingDom) loadingDom.remove();
+            const aiBox = document.createElement("div");
+            aiBox.className = "msg ai";
+            const tipText = escapeHtml("AI-generated content is for reference only.");
+            const clickTip = escapeHtml("Click the image to open original in new tab");
+            const safePrompt = escapeHtml(rawPrompt);
+            const safeSeed = escapeHtml(String(seed));
+            const safeImgUrl = escapeHtml(imgUrl);
+            aiBox.innerHTML = `
+                <div class="tip">${tipText}</div>
+                <div>Prompt: <b>${safePrompt}</b> | Seed: <b>${safeSeed}</b></div>
+                <img src="${safeImgUrl}" alt="AI Generated Art" onclick="window.open('${safeImgUrl}', '_blank')">
+                <div class="tip">${clickTip}</div>
+            `;
+            dom.chatBox.appendChild(aiBox);
+            scrollBottom();
+        };
+        const originalOnError = img.onerror;
+        img.onerror = function() {
+            state.isGenerating = false;
+            dom.sendBtn.disabled = false;
+            dom.input.focus();
+            originalOnError();
+        };
+    }
+
+    // 按钮点击
+    dom.sendBtn.addEventListener("click", generateImage);
+    // 回车发送 Shift+Enter 预留换行
+    dom.input.addEventListener("keydown", e => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            generateImage();
+        }
+    });
+})();
+</script>
+</body>
+</html>
