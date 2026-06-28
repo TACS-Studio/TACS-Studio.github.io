@@ -1,6 +1,6 @@
 <div align="center">
 
-# AI Chat
+# AI Chat (克隆來自bill74186的開源項目)
 
 Free Multi-Model AI Chat Tool
 
