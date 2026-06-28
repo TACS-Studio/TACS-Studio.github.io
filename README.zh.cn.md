@@ -2,7 +2,7 @@
   
 <div align="center">
 
-# AI Chat
+# AI Chat (克隆自 bill74186)
 
 Free Multi-Model AI Chat Tool
 
