@@ -2,7 +2,7 @@ markdown
   
 <div align="center">
 
-# AI Chat
+# AI Chat (Fork from bill74186)
 
 Free Multi-Model AI Chat Tool
 
