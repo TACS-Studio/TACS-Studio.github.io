@@ -5,29 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TA CS - 技术社区</title>
     <style>
-        /* === 基础重置 === */
+        /* ========== 基础 ========== */
+        :root {
+            --bg: #f5f6f8;
+            --card-bg: #ffffff;
+            --text: #333;
+            --text-secondary: #666;
+            --border: #e8e8e8;
+            --header-bg: #ffffff;
+            --header-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --footer-bg: #24292e;
+            --footer-text: #fff;
+            --accent: #0052d9;
+            --hover-bg: #f0f7ff;
+            --icon-bg-html: #e8f4fd;
+            --icon-bg-md: #f0f2f5;
+            --icon-bg-txt: #f5f5f5;
+            --icon-bg-json: #e8f8e8;
+            --icon-bg-other: #f5f5f5;
+            --icon-bg-dir: #fff3e0;
+            --code-bg: #f5f5f5;
+            --modal-bg: #ffffff;
+            --modal-overlay: rgba(0,0,0,0.7);
+            --breadcrumb-bg: #fafafa;
+        }
+
+        /* 夜间模式变量 */
+        body.dark-mode {
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --text-secondary: #aaaaaa;
+            --border: #444;
+            --header-bg: #2d2d2d;
+            --header-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --footer-bg: #111;
+            --footer-text: #ccc;
+            --accent: #58a6ff;
+            --hover-bg: #3a3a3a;
+            --icon-bg-html: #1e3a5f;
+            --icon-bg-md: #3a3a3a;
+            --icon-bg-txt: #3a3a3a;
+            --icon-bg-json: #1e4d3a;
+            --icon-bg-other: #3a3a3a;
+            --icon-bg-dir: #4d3a1e;
+            --code-bg: #3a3a3a;
+            --modal-bg: #2d2d2d;
+            --modal-overlay: rgba(0,0,0,0.85);
+            --breadcrumb-bg: #222;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f5f6f8;
-            color: #333;
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
         }
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         ul { list-style: none; }
 
-        /* === 顶部导航栏 === */
+        /* ========== 顶部导航栏 ========== */
         .header {
-            background-color: #fff;
+            background-color: var(--header-bg);
             height: 60px;
             display: flex;
             align-items: center;
             padding: 0 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: var(--header-shadow);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -47,7 +97,7 @@
             display: block;
             height: 2px;
             width: 100%;
-            background-color: #333;
+            background-color: var(--text);
             border-radius: 2px;
             transition: all 0.3s ease;
         }
@@ -58,36 +108,45 @@
         .logo {
             font-size: 20px;
             font-weight: 800;
-            color: #0052d9;
+            color: var(--accent);
             letter-spacing: 1px;
         }
-        .logo span { color: #333; margin-left: 5px; font-weight: 400; font-size: 14px; }
+        .logo span { color: var(--text); margin-left: 5px; font-weight: 400; font-size: 14px; }
 
-        /* === 侧边栏菜单 === */
+        /* ========== 面包屑 ========== */
+        .breadcrumb {
+            background-color: var(--breadcrumb-bg);
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .breadcrumb strong { color: var(--text); }
+
+        /* ========== 侧边栏 ========== */
         .sidebar {
             position: fixed;
             top: 0;
             left: -260px;
             width: 260px;
             height: 100%;
-            background-color: #fff;
+            background-color: var(--header-bg);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000;
             transition: left 0.3s ease;
             padding-top: 80px;
         }
         .sidebar.active { left: 0; }
-        .sidebar ul li { border-bottom: 1px solid #f0f0f0; }
+        .sidebar ul li { border-bottom: 1px solid var(--border); }
         .sidebar ul li a {
             display: block;
             padding: 18px 25px;
             font-size: 16px;
-            color: #333;
+            color: var(--text);
             transition: all 0.2s;
         }
-        .sidebar ul li a:hover { background-color: #f0f7ff; color: #0052d9; padding-left: 35px; }
+        .sidebar ul li a:hover { background-color: var(--hover-bg); color: var(--accent); padding-left: 35px; }
 
-        /* === 遮罩层 === */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -99,7 +158,7 @@
         }
         .overlay.active { display: block; opacity: 1; }
 
-        /* === 主内容区 === */
+        /* ========== 主内容 ========== */
         .container {
             max-width: 1000px;
             margin: 30px auto;
@@ -112,34 +171,60 @@
         .section-header h2 {
             font-size: 24px;
             font-weight: 600;
-            color: #333;
-            border-left: 4px solid #0052d9;
+            color: var(--text);
+            border-left: 4px solid var(--accent);
             padding-left: 12px;
         }
         .section-header p {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
 
-        /* === 文件网格 === */
+        /* 模式切换按钮组 */
+        .theme-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .theme-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .theme-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .theme-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* 文件网格 */
         .file-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
         }
         .file-card {
-            background: #fff;
+            background: var(--card-bg);
             border-radius: 6px;
             padding: 20px;
-            border: 1px solid #e8e8e8;
+            border: 1px solid var(--border);
             transition: all 0.2s;
             cursor: pointer;
         }
         .file-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-color: #0052d9;
+            border-color: var(--accent);
         }
         .file-icon {
             display: inline-block;
@@ -152,59 +237,59 @@
             font-weight: bold;
             margin-bottom: 12px;
         }
-        .file-icon.html { background: #e8f4fd; color: #0052d9; }
-        .file-icon.md { background: #f0f2f5; color: #333; }
-        .file-icon.txt { background: #f5f5f5; color: #666; }
-        .file-icon.json { background: #e8f8e8; color: #2a6b5a; }
-        .file-icon.other { background: #f5f5f5; color: #999; }
-        .file-icon.dir { background: #fff3e0; color: #e65100; }
+        .file-icon.html { background: var(--icon-bg-html); color: var(--accent); }
+        .file-icon.md { background: var(--icon-bg-md); color: var(--text); }
+        .file-icon.txt { background: var(--icon-bg-txt); color: var(--text-secondary); }
+        .file-icon.json { background: var(--icon-bg-json); color: #2a6b5a; }
+        .file-icon.other { background: var(--icon-bg-other); color: #999; }
+        .file-icon.dir { background: var(--icon-bg-dir); color: #e65100; }
 
         .file-name {
             font-size: 16px;
             font-weight: 600;
-            color: #222;
+            color: var(--text);
             margin-bottom: 6px;
             word-break: break-all;
         }
         .file-meta {
             font-size: 12px;
-            color: #999;
+            color: var(--text-secondary);
             display: flex;
             gap: 15px;
             align-items: center;
         }
         .file-type {
-            background: #f0f2f5;
+            background: var(--icon-bg-other);
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 11px;
-            color: #666;
+            color: var(--text-secondary);
         }
 
-        /* === 加载/错误/空状态 === */
+        /* 加载/错误/空 */
         .loading, .error, .empty {
             text-align: center;
             padding: 60px 20px;
-            color: #999;
+            color: var(--text-secondary);
         }
         .error { color: #e60012; }
         .loading-spinner {
             display: inline-block;
             width: 30px;
             height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0052d9;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* === 内容查看模态框 === */
+        /* 模态框 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: var(--modal-overlay);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -212,7 +297,7 @@
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: #fff;
+            background: var(--modal-bg);
             width: 90%;
             max-width: 900px;
             max-height: 85vh;
@@ -222,23 +307,23 @@
             overflow: hidden;
         }
         .modal-header {
-            background: #f5f6f8;
+            background: var(--breadcrumb-bg);
             padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e8e8e8;
+            border-bottom: 1px solid var(--border);
         }
-        .modal-title { font-size: 16px; font-weight: 600; }
+        .modal-title { font-size: 16px; font-weight: 600; color: var(--text); }
         .modal-close {
             background: none;
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: var(--text-secondary);
             line-height: 1;
         }
-        .modal-close:hover { color: #333; }
+        .modal-close:hover { color: var(--text); }
         .modal-body {
             flex: 1;
             overflow: auto;
@@ -251,7 +336,7 @@
             background: #fff;
         }
         .modal-body pre {
-            background: #f5f5f5;
+            background: var(--code-bg);
             padding: 15px;
             border-radius: 4px;
             overflow-x: auto;
@@ -259,20 +344,21 @@
             font-size: 14px;
             white-space: pre-wrap;
             word-wrap: break-word;
+            color: var(--text);
         }
         .modal-body .md-content h1 { font-size: 24px; margin: 20px 0 10px; }
         .modal-body .md-content h2 { font-size: 20px; margin: 15px 0 8px; }
         .modal-body .md-content h3 { font-size: 16px; margin: 12px 0 6px; }
         .modal-body .md-content p { margin-bottom: 10px; }
         .modal-body .md-content code {
-            background: #f5f5f5;
+            background: var(--code-bg);
             padding: 2px 6px;
             border-radius: 3px;
             font-family: monospace;
             font-size: 13px;
         }
         .modal-body .md-content pre {
-            background: #f5f5f5;
+            background: var(--code-bg);
             padding: 15px;
             border-radius: 4px;
             overflow-x: auto;
@@ -280,17 +366,17 @@
         .modal-body .md-content pre code { background: none; padding: 0; }
         .modal-body .md-content ul, .modal-body .md-content ol { margin-left: 20px; margin-bottom: 10px; }
         .modal-body .md-content blockquote {
-            border-left: 4px solid #0052d9;
+            border-left: 4px solid var(--accent);
             padding-left: 15px;
-            color: #666;
+            color: var(--text-secondary);
             margin: 10px 0;
         }
-        .modal-body .md-content a { color: #0052d9; }
+        .modal-body .md-content a { color: var(--accent); }
 
-        /* === 页脚 === */
+        /* 页脚 */
         footer {
-            background-color: #24292e;
-            color: #fff;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
             padding: 20px 20px;
             text-align: center;
             margin-top: auto;
@@ -306,12 +392,12 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #fff;
+            color: var(--footer-text);
             font-size: 15px;
             font-weight: 500;
             transition: all 0.3s;
         }
-        .footer-link-main:hover { color: #58a6ff; transform: scale(1.05); }
+        .footer-link-main:hover { color: var(--accent); transform: scale(1.05); }
         .github-icon { width: 24px; height: 24px; fill: currentColor; }
 
         .footer-link-extra {
@@ -319,19 +405,12 @@
             font-size: 13px;
             transition: color 0.2s;
         }
-        .footer-link-extra:hover { color: #58a6ff; }
+        .footer-link-extra:hover { color: var(--accent); }
 
-        .footer-divider {
-            color: #484f58;
-            font-size: 13px;
-        }
+        .footer-divider { color: #484f58; font-size: 13px; }
+        .footer-copyright { margin-top: 12px; font-size: 11px; color: #6a737d; }
 
-        .footer-copyright {
-            margin-top: 12px;
-            font-size: 11px;
-            color: #6a737d;
-        }
-
+        /* 响应式 */
         @media (max-width: 600px) {
             .file-grid { grid-template-columns: 1fr; }
             .modal { width: 95%; }
@@ -345,7 +424,7 @@
     <!-- 遮罩层 -->
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <!-- 侧边栏菜单 -->
+    <!-- 侧边栏 -->
     <nav class="sidebar" id="sidebar">
         <ul>
             <li><a href="#" onclick="navigateTo('home'); toggleMenu(); return false;">首页</a></li>
@@ -357,17 +436,20 @@
     <!-- 顶部导航 -->
     <header class="header">
         <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span>
         </div>
         <div class="logo">TA CS <span>技术社区</span></div>
     </header>
 
+    <!-- 面包屑 -->
+    <div class="breadcrumb" id="breadcrumb">
+        当前位置：<strong id="breadcrumbText">首页</strong>
+    </div>
+
     <!-- 主内容 -->
     <main class="container" id="mainContent"></main>
 
-    <!-- 内容查看模态框 -->
+    <!-- 模态框 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -387,15 +469,11 @@
                 </svg>
                 GitHub 主页
             </a>
-
             <span class="footer-divider">|</span>
-
             <a href="https://github.com/TACS-Studio/tacs-pentest-kit" target="_blank" class="footer-link-extra">
                 我的Python工具仓库
             </a>
-
             <span class="footer-divider">|</span>
-
             <a href="https://tacs-studio.github.io/" target="_blank" class="footer-link-extra">
                 我的托管仓库
             </a>
@@ -408,7 +486,7 @@
         const REPO = 'TACS-Studio/tacs-studio.github.io';
         const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents';
 
-        // 板块定义：每个板块用关键词去匹配仓库根目录下的文件夹
+        // 板块定义
         const sectionDefs = {
             'home': {
                 title: '首页',
@@ -422,13 +500,14 @@
             },
             'about': {
                 title: '关于我们',
-                desc: '自动识别目录中的团队信息和文档',
-                keywords: ['关于我们', 'about', 'tools', '关于']
+                desc: '关于我们与主题设置',
+                keywords: ['关于我们', 'about', 'tools', '关于'],
+                special: true   // 特殊处理：直接打开文件并显示主题切换按钮
             }
         };
 
-        // 缓存根目录内容，避免重复请求
         let rootItems = null;
+        let currentSection = localStorage.getItem('ta-cs-current-section') || 'home';
 
         // ==================== 工具函数 ====================
         function buildApiUrl(path) {
@@ -438,8 +517,8 @@
         }
 
         function escapeHtml(text) {
-            var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
         function formatFileSize(bytes) {
@@ -448,33 +527,52 @@
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
-        // ==================== 菜单切换 ====================
-        function toggleMenu() {
-            var sidebar = document.getElementById('sidebar');
-            var overlay = document.getElementById('overlay');
-            var toggleBtn = document.getElementById('menuToggle');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            toggleBtn.classList.toggle('active');
+        function getFileBaseName(name) {
+            // 去掉最后一个扩展名（仅对文件有效，目录名不含点则原样返回）
+            if (name.includes('.')) {
+                return name.replace(/\.[^.]+$/, '');
+            }
+            return name;
         }
 
-        // ==================== 获取根目录内容（带缓存） ====================
+        // ==================== 主题切换 ====================
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            localStorage.setItem('ta-cs-theme', theme);
+            // 更新按钮状态
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === theme);
+            });
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('ta-cs-theme') || 'light';
+            applyTheme(saved);
+        }
+
+        // ==================== 菜单 ====================
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        // ==================== 根目录读取 ====================
         async function getRootItems() {
             if (rootItems) return rootItems;
             const response = await fetch(API_BASE);
-            if (!response.ok) {
-                throw new Error('无法读取仓库根目录 (HTTP ' + response.status + ')');
-            }
+            if (!response.ok) throw new Error('无法读取仓库根目录 (HTTP ' + response.status + ')');
             rootItems = await response.json();
             return rootItems;
         }
 
-        // ==================== 根据关键词匹配目录 ====================
         function findDirectoryByKeywords(items, keywords) {
             if (!Array.isArray(items)) return null;
-            // 只考虑目录
             const dirs = items.filter(item => item.type === 'dir');
-            // 按关键词顺序尝试匹配
             for (const kw of keywords) {
                 const match = dirs.find(dir => dir.name.includes(kw));
                 if (match) return match;
@@ -482,85 +580,73 @@
             return null;
         }
 
-        // ==================== 页面导航 ====================
+        // ==================== 导航 ====================
         async function navigateTo(sectionKey) {
-            const section = sectionDefs[sectionKey];
-            const main = document.getElementById('mainContent');
+            currentSection = sectionKey;
+            localStorage.setItem('ta-cs-current-section', sectionKey);
 
-            main.innerHTML =
-                '<div class="section-header">' +
-                    '<h2>' + section.title + '</h2>' +
-                    '<p>' + section.desc + '</p>' +
-                '</div>' +
-                '<div class="loading"><div class="loading-spinner"></div><br>正在加载...</div>';
+            // 更新面包屑
+            document.getElementById('breadcrumbText').textContent = sectionDefs[sectionKey].title;
+
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                // 1. 获取根目录所有条目
                 const rootItems = await getRootItems();
-                // 2. 匹配对应的目录
-                const targetDir = findDirectoryByKeywords(rootItems, section.keywords);
-                if (!targetDir) {
-                    throw new Error('在仓库根目录下未找到与“' + section.title + '”匹配的文件夹');
+                const targetDir = findDirectoryByKeywords(rootItems, sectionDefs[sectionKey].keywords);
+                if (!targetDir) throw new Error('未找到与“' + sectionDefs[sectionKey].title + '”匹配的文件夹');
+
+                // 如果是关于我们，走特殊渲染
+                if (sectionDefs[sectionKey].special) {
+                    renderAboutSection(targetDir);
+                    return;
                 }
-                // 3. 请求该目录的文件列表
+
+                // 普通板块：加载文件列表
                 const response = await fetch(buildApiUrl(targetDir.path));
-                if (!response.ok) {
-                    throw new Error('读取目录失败 (HTTP ' + response.status + ')');
-                }
+                if (!response.ok) throw new Error('读取目录失败 (HTTP ' + response.status + ')');
                 const files = await response.json();
-                renderFileList(files, section);
+                renderFileList(files, sectionDefs[sectionKey]);
             } catch (error) {
-                main.innerHTML =
-                    '<div class="section-header">' +
-                        '<h2>' + section.title + '</h2>' +
-                        '<p>' + section.desc + '</p>' +
-                    '</div>' +
-                    '<div class="error">' +
-                        '<p>加载失败: ' + error.message + '</p>' +
-                        '<p style="margin-top:10px;font-size:12px;color:#999;">请检查仓库目录结构，确保根目录下存在相关文件夹</p>' +
-                    '</div>';
+                main.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
             }
         }
 
         // ==================== 渲染文件列表 ====================
         function renderFileList(files, config) {
-            var main = document.getElementById('mainContent');
-
+            const main = document.getElementById('mainContent');
             if (!files || files.length === 0) {
-                main.innerHTML =
-                    '<div class="section-header">' +
-                        '<h2>' + config.title + '</h2>' +
-                        '<p>' + config.desc + '</p>' +
-                    '</div>' +
-                    '<div class="empty"><p>该目录暂无文件</p>' +
-                    '<p style="margin-top:8px;font-size:12px;color:#999;">将文件放入对应目录后会自动显示</p></div>';
+                main.innerHTML = '<div class="empty">该目录暂无文件</div>';
                 return;
             }
 
-            files.sort(function(a, b) {
+            files.sort((a, b) => {
                 if (a.type === 'dir' && b.type !== 'dir') return -1;
                 if (a.type !== 'dir' && b.type === 'dir') return 1;
                 return a.name.localeCompare(b.name);
             });
 
-            var html = '<div class="file-grid">';
-            files.forEach(function(file) {
-                var icon = getFileIcon(file);
-                var iconClass = getFileIconClass(file);
-                var typeLabel = file.type === 'dir' ? '目录' : getFileTypeLabel(file.name);
-                var sizeLabel = file.type === 'file' ? formatFileSize(file.size) : '';
-                var date = '';
+            let html = '<div class="file-grid">';
+            files.forEach(file => {
+                const icon = getFileIcon(file);
+                const iconClass = getFileIconClass(file);
+                const typeLabel = file.type === 'dir' ? '目录' : getFileTypeLabel(file.name);
+                const sizeLabel = file.type === 'file' ? formatFileSize(file.size) : '';
+                let date = '';
                 if (file.commit && file.commit.committer && file.commit.committer.date) {
                     date = new Date(file.commit.committer.date).toLocaleDateString('zh-CN');
                 }
 
-                var clickHandler = file.type === 'file'
+                // 显示名去掉扩展名
+                const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
+
+                const clickHandler = file.type === 'file'
                     ? "openFile('" + file.download_url + "', '" + file.name + "')"
                     : "navigateDir('" + file.path + "')";
 
                 html += '<div class="file-card" onclick="' + clickHandler + '">' +
                     '<div class="file-icon ' + iconClass + '">' + icon + '</div>' +
-                    '<div class="file-name">' + file.name + '</div>' +
+                    '<div class="file-name">' + displayName + '</div>' +
                     '<div class="file-meta">' +
                         '<span class="file-type">' + typeLabel + '</span>' +
                         (sizeLabel ? '<span>' + sizeLabel + '</span>' : '') +
@@ -572,28 +658,99 @@
             main.innerHTML = html;
         }
 
+        // ==================== 关于我们特殊渲染 ====================
+        async function renderAboutSection(targetDir) {
+            const main = document.getElementById('mainContent');
+            // 显示主题切换按钮 + 文件内容
+            main.innerHTML = '<div class="theme-buttons">' +
+                '<button class="theme-btn" data-theme="light" onclick="applyTheme(\'light\')">☀️ 白天模式</button>' +
+                '<button class="theme-btn" data-theme="dark" onclick="applyTheme(\'dark\')">🌙 夜间模式</button>' +
+            '</div>' +
+            '<div id="aboutContent" class="about-content">' +
+                '<div class="loading"><div class="loading-spinner"></div><br>正在打开关于我们文件...</div>' +
+            '</div>';
+
+            // 初始化按钮状态
+            const currentTheme = localStorage.getItem('ta-cs-theme') || 'light';
+            applyTheme(currentTheme);
+
+            try {
+                const response = await fetch(buildApiUrl(targetDir.path));
+                if (!response.ok) throw new Error('读取目录失败');
+                const files = await response.json();
+
+                // 选择优先文件：HTML > Markdown > 其他文本
+                let targetFile = null;
+                const htmlFile = files.find(f => f.type === 'file' && /\.(html?)$/i.test(f.name));
+                const mdFile = files.find(f => f.type === 'file' && /\.md$/i.test(f.name));
+                const txtFile = files.find(f => f.type === 'file' && /\.(txt|text)$/i.test(f.name));
+                const anyFile = files.find(f => f.type === 'file');
+
+                targetFile = htmlFile || mdFile || txtFile || anyFile;
+                if (!targetFile) throw new Error('该目录下没有可显示的文件');
+
+                // 直接全屏显示文件内容
+                const contentResponse = await fetch(targetFile.download_url);
+                const content = await contentResponse.text();
+                const ext = targetFile.name.split('.').pop().toLowerCase();
+
+                const aboutContainer = document.getElementById('aboutContent');
+
+                if (['html', 'htm'].includes(ext)) {
+                    // 用 iframe 嵌入，占满剩余空间
+                    const blob = new Blob([content], { type: 'text/html' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    aboutContainer.innerHTML = '<iframe src="' + blobUrl + '" style="width:100%; height: calc(100vh - 250px); border: none; border-radius: 6px; background: #fff;"></iframe>';
+                } else if (ext === 'md') {
+                    aboutContainer.innerHTML = '<div class="md-content">' + renderMarkdown(content) + '</div>';
+                } else {
+                    // 文本美化自动识别
+                    aboutContainer.innerHTML = renderSmartText(content);
+                }
+            } catch (error) {
+                document.getElementById('aboutContent').innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
+            }
+        }
+
+        // ==================== 智能文本美化 ====================
+        function renderSmartText(content) {
+            // 尝试 JSON
+            try {
+                const parsed = JSON.parse(content);
+                return '<pre><code>' + JSON.stringify(parsed, null, 2) + '</code></pre>';
+            } catch(e) {
+                // 不是 JSON，检测 Markdown
+            }
+            // 简单检测 Markdown（包含 # 标题、** 加粗、- 列表、``` 代码块等）
+            if (/^#{1,3}\s/m.test(content) || /\*\*.*\*\*/s.test(content) || /^-\s/m.test(content) || /```/.test(content)) {
+                return '<div class="md-content">' + renderMarkdown(content) + '</div>';
+            }
+            // 普通文本
+            return '<pre><code>' + escapeHtml(content) + '</code></pre>';
+        }
+
         // ==================== 文件图标 ====================
         function getFileIcon(file) {
-            if (file.type === 'dir') return '\u{1F4C1}';
-            var ext = file.name.split('.').pop().toLowerCase();
+            if (file.type === 'dir') return '📁';
+            const ext = file.name.split('.').pop().toLowerCase();
             switch(ext) {
-                case 'html': case 'htm': return '&lt;&gt;';
-                case 'md': return '\u{1F4DD}';
-                case 'txt': return '\u{1F4C4}';
+                case 'html': case 'htm': return '<>';
+                case 'md': return '📝';
+                case 'txt': return '📄';
                 case 'json': return '{}';
                 case 'css': return '#';
-                case 'js': return '\u{1F4DC}';
-                case 'py': return '\u{1F40D}';
-                case 'xml': return '&lt;/&gt;';
-                case 'yml': case 'yaml': return '\u2699';
-                case 'sh': return '\u2638';
-                default: return '\u{1F4CE}';
+                case 'js': return '📜';
+                case 'py': return '🐍';
+                case 'xml': return '</>';
+                case 'yml': case 'yaml': return '⚙';
+                case 'sh': return '☸';
+                default: return '📎';
             }
         }
 
         function getFileIconClass(file) {
             if (file.type === 'dir') return 'dir';
-            var ext = file.name.split('.').pop().toLowerCase();
+            const ext = file.name.split('.').pop().toLowerCase();
             if (['html', 'htm'].includes(ext)) return 'html';
             if (ext === 'md') return 'md';
             if (ext === 'json') return 'json';
@@ -602,8 +759,8 @@
         }
 
         function getFileTypeLabel(name) {
-            var ext = name.split('.').pop().toLowerCase();
-            var labels = {
+            const ext = name.split('.').pop().toLowerCase();
+            const labels = {
                 'html': '网页', 'htm': '网页', 'md': 'Markdown',
                 'txt': '文本', 'json': 'JSON', 'css': '样式',
                 'js': '脚本', 'py': 'Python', 'xml': 'XML',
@@ -613,36 +770,29 @@
             return labels[ext] || ext.toUpperCase();
         }
 
-        // ==================== 打开文件 ====================
+        // ==================== 打开文件（模态框） ====================
         async function openFile(url, name) {
-            var modal = document.getElementById('modalOverlay');
-            var title = document.getElementById('modalTitle');
-            var body = document.getElementById('modalBody');
+            const modal = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
-            title.textContent = name;
-            body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>正在加载文件...</div>';
+            title.textContent = name;  // 标题仍然显示全名（含扩展名）便于识别
+            body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                var response = await fetch(url);
-                var content = await response.text();
-                var ext = name.split('.').pop().toLowerCase();
+                const response = await fetch(url);
+                const content = await response.text();
+                const ext = name.split('.').pop().toLowerCase();
 
                 if (['html', 'htm'].includes(ext)) {
-                    var blob = new Blob([content], { type: 'text/html' });
-                    var blobUrl = URL.createObjectURL(blob);
+                    const blob = new Blob([content], { type: 'text/html' });
+                    const blobUrl = URL.createObjectURL(blob);
                     body.innerHTML = '<iframe src="' + blobUrl + '"></iframe>';
                 } else if (ext === 'md') {
                     body.innerHTML = '<div class="md-content">' + renderMarkdown(content) + '</div>';
-                } else if (ext === 'json') {
-                    try {
-                        var parsed = JSON.parse(content);
-                        body.innerHTML = '<pre><code>' + JSON.stringify(parsed, null, 2) + '</code></pre>';
-                    } catch(e) {
-                        body.innerHTML = '<pre><code>' + escapeHtml(content) + '</code></pre>';
-                    }
                 } else {
-                    body.innerHTML = '<pre><code>' + escapeHtml(content) + '</code></pre>';
+                    body.innerHTML = renderSmartText(content);  // 智能美化
                 }
             } catch (error) {
                 body.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
@@ -650,10 +800,9 @@
         }
 
         function navigateDir(path) {
-            alert('目录导航: ' + path + '\n\n提示: 当前版本仅支持根目录下的三个固定目录，后续可扩展递归浏览功能。');
+            alert('目录导航: ' + path + '\n\n当前版本暂不支持子目录浏览');
         }
 
-        // ==================== 模态框 ====================
         function closeModal(event) {
             if (!event || event.target === document.getElementById('modalOverlay')) {
                 document.getElementById('modalOverlay').classList.remove('active');
@@ -663,8 +812,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' || e.key === 'Esc') {
                 closeModal();
-                var sidebar = document.getElementById('sidebar');
-                if (sidebar.classList.contains('active')) {
+                if (document.getElementById('sidebar').classList.contains('active')) {
                     toggleMenu();
                 }
             }
@@ -672,7 +820,7 @@
 
         // ==================== Markdown 渲染 ====================
         function renderMarkdown(text) {
-            var html = text
+            let html = text
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
@@ -703,8 +851,9 @@
             return html;
         }
 
-        // ==================== 初始加载 ====================
-        navigateTo('home');
+        // ==================== 初始化 ====================
+        initTheme();
+        navigateTo(currentSection);
     </script>
 </body>
 </html>
