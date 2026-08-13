@@ -140,7 +140,7 @@
             background-color: var(--sidebar-bg);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: left 0.3s ease;
             padding-top: 80px;
             display: flex;
             flex-direction: column;
@@ -302,7 +302,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ========== 模态框（全屏覆盖 + 过渡动画） ========== */
+        /* ========== 模态框（全屏覆盖） ========== */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -329,7 +329,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .modal-overlay.active .modal {
@@ -337,7 +337,7 @@
         }
         .modal-header {
             background: var(--breadcrumb-bg);
-            padding: 15px 20px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -352,15 +352,20 @@
         .modal-close {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 14px;          /* 小号文字 */
             cursor: pointer;
             color: var(--text-secondary);
             line-height: 1;
-            transition: color 0.2s, transform 0.2s;
+            transition: color 0.2s, background 0.2s;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .modal-close:hover {
             color: var(--text);
-            transform: rotate(90deg);
+            background: var(--hover-bg);
         }
         .modal-body {
             flex: 1;
@@ -497,11 +502,12 @@
 
     <main class="container" id="mainContent"></main>
 
+    <!-- 全屏模态框，关闭按钮为“< 回到上一层” -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <span class="modal-title" id="modalTitle">文件内容</span>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal()">&lt; 回到上一层</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
         </div>
@@ -528,29 +534,30 @@
     </footer>
 
     <script>
+        // ==================== 配置 ====================
         const REPO = 'TACS-Studio/tacs-studio.github.io';
         const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents';
 
+        // 使用直接指定路径，避免自动匹配导致 403/404
         const sectionDefs = {
             'home': {
                 title: '首页',
                 desc: '欢迎你',
-                keywords: ['网页文件', 'page_html', 'html']
+                path: 'page_html_网页文件'          // 请根据实际修改
             },
             'security': {
                 title: '安全文档',
                 desc: '自动识别目录中的安全技术文档，新增文件自动显示',
-                keywords: ['文档', 'backend', 'doc']
+                path: 'backend_文档'               // 请根据实际修改
             },
             'about': {
                 title: '关于我们',
                 desc: '关于我们',
-                keywords: ['关于我们', 'about', 'tools', '关于'],
+                path: 'tools_关于我们',             // 请根据实际修改
                 special: true
             }
         };
 
-        let rootItems = null;
         let currentSection = localStorage.getItem('ta-cs-current-section') || 'home';
 
         function buildApiUrl(path) {
@@ -597,24 +604,6 @@
             document.getElementById('menuToggle').classList.toggle('active');
         }
 
-        async function getRootItems() {
-            if (rootItems) return rootItems;
-            const response = await fetch(API_BASE);
-            if (!response.ok) throw new Error('无法读取仓库根目录 (HTTP ' + response.status + ')');
-            rootItems = await response.json();
-            return rootItems;
-        }
-
-        function findDirectoryByKeywords(items, keywords) {
-            if (!Array.isArray(items)) return null;
-            const dirs = items.filter(item => item.type === 'dir');
-            for (const kw of keywords) {
-                const match = dirs.find(dir => dir.name.includes(kw));
-                if (match) return match;
-            }
-            return null;
-        }
-
         async function navigateTo(sectionKey) {
             currentSection = sectionKey;
             localStorage.setItem('ta-cs-current-section', sectionKey);
@@ -624,19 +613,15 @@
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                const rootItems = await getRootItems();
-                const targetDir = findDirectoryByKeywords(rootItems, sectionDefs[sectionKey].keywords);
-                if (!targetDir) throw new Error('未找到与“' + sectionDefs[sectionKey].title + '”匹配的文件夹');
-
-                if (sectionDefs[sectionKey].special) {
-                    renderAboutSection(targetDir);
-                    return;
-                }
-
-                const response = await fetch(buildApiUrl(targetDir.path));
+                const response = await fetch(buildApiUrl(sectionDefs[sectionKey].path));
                 if (!response.ok) throw new Error('读取目录失败 (HTTP ' + response.status + ')');
                 const files = await response.json();
-                renderFileList(files, sectionDefs[sectionKey]);
+
+                if (sectionDefs[sectionKey].special) {
+                    renderAboutSection(files);
+                } else {
+                    renderFileList(files, sectionDefs[sectionKey]);
+                }
             } catch (error) {
                 main.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
             }
@@ -686,14 +671,12 @@
             main.innerHTML = html;
         }
 
-        async function renderAboutSection(targetDir) {
+        async function renderAboutSection(files) {
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>正在打开关于我们文件...</div>';
 
             try {
-                const response = await fetch(buildApiUrl(targetDir.path));
-                if (!response.ok) throw new Error('读取目录失败');
-                const files = await response.json();
+                if (!Array.isArray(files) || files.length === 0) throw new Error('目录为空');
 
                 let targetFile = null;
                 const htmlFile = files.find(f => f.type === 'file' && /\.(html?)$/i.test(f.name));
@@ -779,7 +762,7 @@
             const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
-            title.textContent = getFileBaseName(name);
+            title.textContent = getFileBaseName(name);   // 只显示文件名，不含扩展名
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
