@@ -167,8 +167,9 @@
             padding-left: 35px;
         }
 
+        /* 主题切换区域特殊样式 */
         .sidebar .theme-switch-section {
-            margin-top: auto;
+            margin-top: auto; /* 靠底部 */
             padding: 20px 0;
             border-top: 1px solid var(--border);
         }
@@ -226,6 +227,7 @@
             margin-top: 5px;
         }
 
+        /* 文件网格 */
         .file-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -236,12 +238,12 @@
             border-radius: 6px;
             padding: 20px;
             border: 1px solid var(--border);
-            transition: all 0.25s ease;
+            transition: all 0.2s;
             cursor: pointer;
         }
         .file-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border-color: var(--accent);
         }
         .file-icon {
@@ -284,6 +286,7 @@
             color: var(--text-secondary);
         }
 
+        /* 加载/错误/空 */
         .loading, .error, .empty {
             text-align: center;
             padding: 60px 20px;
@@ -302,83 +305,55 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ========== 模态框（全屏覆盖） ========== */
+        /* 模态框 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: var(--modal-overlay);
             z-index: 2000;
-            display: flex;
-            align-items: center;
+            display: none;
             justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            align-items: center;
         }
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
+        .modal-overlay.active { display: flex; }
         .modal {
-            position: relative;
-            width: 100%;
-            height: 100%;
             background: var(--modal-bg);
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .modal-overlay.active .modal {
-            transform: translateY(0);
         }
         .modal-header {
             background: var(--breadcrumb-bg);
-            padding: 10px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
         }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text);
-        }
+        .modal-title { font-size: 16px; font-weight: 600; color: var(--text); }
         .modal-close {
             background: none;
             border: none;
-            font-size: 14px;          /* 小号文字 */
+            font-size: 24px;
             cursor: pointer;
             color: var(--text-secondary);
             line-height: 1;
-            transition: color 0.2s, background 0.2s;
-            padding: 6px 12px;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
-        .modal-close:hover {
-            color: var(--text);
-            background: var(--hover-bg);
-        }
+        .modal-close:hover { color: var(--text); }
         .modal-body {
             flex: 1;
-            overflow-y: auto;
+            overflow: auto;
             padding: 20px;
-            scroll-behavior: smooth;
         }
         .modal-body iframe {
             width: 100%;
-            height: 100%;
+            min-height: 500px;
             border: none;
             background: #fff;
-            min-height: 500px;
         }
         .modal-body pre {
             background: var(--code-bg);
@@ -418,6 +393,7 @@
         }
         .modal-body .md-content a { color: var(--accent); }
 
+        /* 页脚 */
         footer {
             background-color: var(--footer-bg);
             color: var(--footer-text);
@@ -454,8 +430,10 @@
         .footer-divider { color: #484f58; font-size: 13px; }
         .footer-copyright { margin-top: 12px; font-size: 11px; color: #6a737d; }
 
+        /* 响应式 */
         @media (max-width: 600px) {
             .file-grid { grid-template-columns: 1fr; }
+            .modal { width: 95%; }
             .modal-body iframe { min-height: 350px; }
             .footer-links { gap: 15px; }
         }
@@ -463,8 +441,10 @@
 </head>
 <body>
 
+    <!-- 遮罩层 -->
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
+    <!-- 侧边栏 -->
     <nav class="sidebar" id="sidebar">
         <ul>
             <li><a href="#" onclick="navigateTo('home'); toggleMenu(); return false;">首页</a></li>
@@ -472,6 +452,7 @@
             <li><a href="#" onclick="navigateTo('about'); toggleMenu(); return false;">关于我们</a></li>
         </ul>
 
+        <!-- 主题切换选项：关于我们下面 -->
         <div class="theme-switch-section">
             <div class="theme-switch-label">主题切换</div>
             <ul>
@@ -489,6 +470,7 @@
         </div>
     </nav>
 
+    <!-- 顶部导航 -->
     <header class="header">
         <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
             <span></span><span></span><span></span>
@@ -496,23 +478,26 @@
         <div class="logo">TA CS <span>技术社区</span></div>
     </header>
 
+    <!-- 面包屑 -->
     <div class="breadcrumb" id="breadcrumb">
         当前位置：<strong id="breadcrumbText">首页</strong>
     </div>
 
+    <!-- 主内容 -->
     <main class="container" id="mainContent"></main>
 
-    <!-- 全屏模态框，关闭按钮为“< 回到上一层” -->
+    <!-- 模态框 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <span class="modal-title" id="modalTitle">文件内容</span>
-                <button class="modal-close" onclick="closeModal()">&lt; 回到上一层</button>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
+    <!-- 页脚 -->
     <footer>
         <div class="footer-links">
             <a href="https://github.com/TACS-Studio" target="_blank" class="footer-link-main">
@@ -538,28 +523,29 @@
         const REPO = 'TACS-Studio/tacs-studio.github.io';
         const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents';
 
-        // 使用直接指定路径，避免自动匹配导致 403/404
         const sectionDefs = {
             'home': {
                 title: '首页',
                 desc: '欢迎你',
-                path: 'page_html_网页文件'          // 请根据实际修改
+                keywords: ['网页文件', 'page_html', 'html']
             },
             'security': {
                 title: '安全文档',
                 desc: '自动识别目录中的安全技术文档，新增文件自动显示',
-                path: 'backend_文档'               // 请根据实际修改
+                keywords: ['文档', 'backend', 'doc']
             },
             'about': {
                 title: '关于我们',
                 desc: '关于我们',
-                path: 'tools_关于我们',             // 请根据实际修改
-                special: true
+                keywords: ['关于我们', 'about', 'tools', '关于'],
+                special: true   // 特殊处理：直接打开文件
             }
         };
 
+        let rootItems = null;
         let currentSection = localStorage.getItem('ta-cs-current-section') || 'home';
 
+        // ==================== 工具函数 ====================
         function buildApiUrl(path) {
             if (!path) return API_BASE;
             const segments = path.split('/').filter(Boolean).map(seg => encodeURIComponent(seg));
@@ -584,6 +570,7 @@
             return name;
         }
 
+        // ==================== 主题切换 ====================
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -598,12 +585,33 @@
             applyTheme(saved);
         }
 
+        // ==================== 菜单 ====================
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
             document.getElementById('menuToggle').classList.toggle('active');
         }
 
+        // ==================== 根目录读取 ====================
+        async function getRootItems() {
+            if (rootItems) return rootItems;
+            const response = await fetch(API_BASE);
+            if (!response.ok) throw new Error('无法读取仓库根目录 (HTTP ' + response.status + ')');
+            rootItems = await response.json();
+            return rootItems;
+        }
+
+        function findDirectoryByKeywords(items, keywords) {
+            if (!Array.isArray(items)) return null;
+            const dirs = items.filter(item => item.type === 'dir');
+            for (const kw of keywords) {
+                const match = dirs.find(dir => dir.name.includes(kw));
+                if (match) return match;
+            }
+            return null;
+        }
+
+        // ==================== 导航 ====================
         async function navigateTo(sectionKey) {
             currentSection = sectionKey;
             localStorage.setItem('ta-cs-current-section', sectionKey);
@@ -613,20 +621,25 @@
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                const response = await fetch(buildApiUrl(sectionDefs[sectionKey].path));
-                if (!response.ok) throw new Error('读取目录失败 (HTTP ' + response.status + ')');
-                const files = await response.json();
+                const rootItems = await getRootItems();
+                const targetDir = findDirectoryByKeywords(rootItems, sectionDefs[sectionKey].keywords);
+                if (!targetDir) throw new Error('未找到与“' + sectionDefs[sectionKey].title + '”匹配的文件夹');
 
                 if (sectionDefs[sectionKey].special) {
-                    renderAboutSection(files);
-                } else {
-                    renderFileList(files, sectionDefs[sectionKey]);
+                    renderAboutSection(targetDir);
+                    return;
                 }
+
+                const response = await fetch(buildApiUrl(targetDir.path));
+                if (!response.ok) throw new Error('读取目录失败 (HTTP ' + response.status + ')');
+                const files = await response.json();
+                renderFileList(files, sectionDefs[sectionKey]);
             } catch (error) {
                 main.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
             }
         }
 
+        // ==================== 渲染文件列表 ====================
         function renderFileList(files, config) {
             const main = document.getElementById('mainContent');
             if (!files || files.length === 0) {
@@ -671,12 +684,15 @@
             main.innerHTML = html;
         }
 
-        async function renderAboutSection(files) {
+        // ==================== 关于我们特殊渲染（不显示文件列表，直接全屏显示第一个文件） ====================
+        async function renderAboutSection(targetDir) {
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>正在打开关于我们文件...</div>';
 
             try {
-                if (!Array.isArray(files) || files.length === 0) throw new Error('目录为空');
+                const response = await fetch(buildApiUrl(targetDir.path));
+                if (!response.ok) throw new Error('读取目录失败');
+                const files = await response.json();
 
                 let targetFile = null;
                 const htmlFile = files.find(f => f.type === 'file' && /\.(html?)$/i.test(f.name));
@@ -705,17 +721,21 @@
             }
         }
 
+        // ==================== 智能文本美化 ====================
         function renderSmartText(content) {
             try {
                 const parsed = JSON.parse(content);
                 return '<pre><code>' + JSON.stringify(parsed, null, 2) + '</code></pre>';
-            } catch(e) {}
+            } catch(e) {
+                // 不是 JSON
+            }
             if (/^#{1,3}\s/m.test(content) || /\*\*.*\*\*/s.test(content) || /^-\s/m.test(content) || /```/.test(content)) {
                 return '<div class="md-content">' + renderMarkdown(content) + '</div>';
             }
             return '<pre><code>' + escapeHtml(content) + '</code></pre>';
         }
 
+        // ==================== 文件图标 ====================
         function getFileIcon(file) {
             if (file.type === 'dir') return '📁';
             const ext = file.name.split('.').pop().toLowerCase();
@@ -756,13 +776,14 @@
             return labels[ext] || ext.toUpperCase();
         }
 
+        // ==================== 打开文件（模态框） ====================
         async function openFile(url, name) {
             const modal = document.getElementById('modalOverlay');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
-            title.textContent = getFileBaseName(name);   // 只显示文件名，不含扩展名
+            title.textContent = name;
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
@@ -803,6 +824,7 @@
             }
         });
 
+        // ==================== Markdown 渲染 ====================
         function renderMarkdown(text) {
             let html = text
                 .replace(/&/g, '&amp;')
@@ -835,7 +857,7 @@
             return html;
         }
 
-        // 初始化
+        // ==================== 初始化 ====================
         initTheme();
         navigateTo(currentSection);
     </script>
