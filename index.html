@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TA CS - 技术社区</title>
     <style>
         /* ========== 基础 ========== */
@@ -13,7 +13,7 @@
             --text-secondary: #666;
             --border: #e8e8e8;
             --header-bg: #ffffff;
-            --header-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --header-shadow: 0 2px 8px rgba(0,0,0,0.06);
             --footer-bg: #24292e;
             --footer-text: #fff;
             --accent: #0052d9;
@@ -32,6 +32,9 @@
             --sidebar-text: #333;
             --sidebar-hover-bg: #f0f7ff;
             --sidebar-hover-text: #0052d9;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.12);
         }
 
         body.dark-mode {
@@ -41,7 +44,7 @@
             --text-secondary: #aaaaaa;
             --border: #444;
             --header-bg: #2d2d2d;
-            --header-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --header-shadow: 0 2px 8px rgba(0,0,0,0.3);
             --footer-bg: #111;
             --footer-text: #ccc;
             --accent: #58a6ff;
@@ -60,10 +63,13 @@
             --sidebar-text: #e0e0e0;
             --sidebar-hover-bg: #3a3a3a;
             --sidebar-hover-text: #58a6ff;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.15);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+            --shadow-lg: 0 8px 20px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scrollbar-gutter: stable; } /* 预留滚动条空间，防止抖动 */
+        html { scrollbar-gutter: stable; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg);
@@ -75,7 +81,7 @@
             min-height: 100vh;
             transition: background-color 0.3s, color 0.3s;
         }
-        body.modal-open { overflow: hidden; } /* 打开模态框时锁定背景滚动 */
+        body.modal-open { overflow: hidden; }
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         ul { list-style: none; }
 
@@ -86,7 +92,7 @@
             display: flex;
             align-items: center;
             padding: 0 20px;
-            box-shadow: var(--header-shadow);
+            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -117,10 +123,78 @@
         .logo {
             font-size: 20px;
             font-weight: 800;
-            color: var(--accent);
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            user-select: none;
         }
-        .logo span { color: var(--text); margin-left: 5px; font-weight: 400; font-size: 14px; }
+        /* 渐变文字 */
+        .logo-gradient {
+            background: linear-gradient(135deg, #0052d9 0%, #00a8ff 50%, #0052d9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        .logo span.logo-text {
+            color: var(--text);
+            margin-left: 5px;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        /* 搜索框 */
+        .search-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            height: 36px;
+            padding: 0 15px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,82,217,0.1);
+        }
+        .search-box .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+            font-size: 14px;
+        }
+        /* 搜索框在移动端隐藏（可通过菜单显示，这里简单处理） */
+        @media (max-width: 600px) {
+            .search-wrapper {
+                padding: 0 10px;
+            }
+            .search-box {
+                max-width: 160px;
+            }
+            .logo span.logo-text {
+                display: none; /* 小屏只显示TACS渐变 */
+            }
+        }
 
         /* ========== 面包屑 ========== */
         .breadcrumb {
@@ -140,7 +214,7 @@
             width: 260px;
             height: 100%;
             background-color: var(--sidebar-bg);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.15);
             z-index: 1000;
             transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             padding-top: 80px;
@@ -152,21 +226,23 @@
         .sidebar ul li a,
         .sidebar ul li .sidebar-link {
             display: block;
-            padding: 18px 25px;
-            font-size: 16px;
+            padding: 14px 25px;
+            font-size: 15px;
             color: var(--sidebar-text);
-            transition: all 0.2s;
+            transition: all 0.25s;
             cursor: pointer;
             background: none;
             border: none;
             text-align: left;
             width: 100%;
+            border-radius: 0;
         }
         .sidebar ul li a:hover,
         .sidebar ul li .sidebar-link:hover {
             background-color: var(--sidebar-hover-bg);
             color: var(--sidebar-hover-text);
-            padding-left: 35px;
+            padding-left: 30px;
+            box-shadow: inset 3px 0 0 var(--accent);
         }
 
         /* 时间显示区域 */
@@ -215,10 +291,18 @@
         .sidebar .theme-switch-section .sidebar-link {
             padding: 10px 25px;
             font-size: 14px;
+            border-radius: 6px;
+            margin: 4px 12px;
+            width: auto;
+            display: block;
+            transition: all 0.25s;
+            box-shadow: var(--shadow-sm);
         }
         .sidebar .theme-switch-section .sidebar-link:hover {
             padding-left: 25px;
             color: var(--sidebar-hover-text);
+            box-shadow: var(--shadow-md);
+            background-color: var(--hover-bg);
         }
 
         .overlay {
@@ -258,31 +342,33 @@
         .file-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
+            gap: 18px;
         }
         .file-card {
             background: var(--card-bg);
-            border-radius: 6px;
+            border-radius: 10px;
             padding: 20px;
             border: 1px solid var(--border);
             transition: all 0.25s ease;
             cursor: pointer;
+            box-shadow: var(--shadow-sm);
         }
         .file-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
             border-color: var(--accent);
         }
         .file-icon {
             display: inline-block;
-            width: 36px;
-            height: 36px;
-            line-height: 36px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
             text-align: center;
-            border-radius: 6px;
+            border-radius: 10px;
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
         }
         .file-icon.html { background: var(--icon-bg-html); color: var(--accent); }
         .file-icon.md { background: var(--icon-bg-md); color: var(--text); }
@@ -307,10 +393,11 @@
         }
         .file-type {
             background: var(--icon-bg-other);
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
             font-size: 11px;
             color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
         }
 
         .loading, .error, .empty {
@@ -358,8 +445,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: none; /* 移除 transform 动画，避免抖动 */
-            transition: none;
         }
         .modal-header {
             background: var(--breadcrumb-bg);
@@ -369,6 +454,7 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
         }
         .modal-title {
             font-size: 18px;
@@ -382,16 +468,18 @@
             cursor: pointer;
             color: var(--text-secondary);
             line-height: 1;
-            transition: color 0.2s, background 0.2s;
-            padding: 6px 12px;
-            border-radius: 4px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            padding: 8px 16px;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            box-shadow: var(--shadow-sm);
         }
         .modal-close:hover {
             color: var(--text);
             background: var(--hover-bg);
+            box-shadow: var(--shadow-md);
         }
         .modal-body {
             flex: 1;
@@ -409,13 +497,14 @@
         .modal-body pre {
             background: var(--code-bg);
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 8px;
             overflow-x: auto;
             font-family: "Courier New", Courier, monospace;
             font-size: 14px;
             white-space: pre-wrap;
             word-wrap: break-word;
             color: var(--text);
+            box-shadow: var(--shadow-sm);
         }
         .modal-body .md-content h1 { font-size: 24px; margin: 20px 0 10px; }
         .modal-body .md-content h2 { font-size: 20px; margin: 15px 0 8px; }
@@ -431,8 +520,9 @@
         .modal-body .md-content pre {
             background: var(--code-bg);
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 8px;
             overflow-x: auto;
+            box-shadow: var(--shadow-sm);
         }
         .modal-body .md-content pre code { background: none; padding: 0; }
         .modal-body .md-content ul, .modal-body .md-content ol { margin-left: 20px; margin-bottom: 10px; }
@@ -450,6 +540,7 @@
             padding: 20px 20px;
             text-align: center;
             margin-top: auto;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
         }
         .footer-links {
             display: flex;
@@ -480,10 +571,54 @@
         .footer-divider { color: #484f58; font-size: 13px; }
         .footer-copyright { margin-top: 12px; font-size: 11px; color: #6a737d; }
 
+        /* ========== 移动端优化 ========== */
         @media (max-width: 600px) {
-            .file-grid { grid-template-columns: 1fr; }
-            .modal-body iframe { min-height: 350px; }
-            .footer-links { gap: 15px; }
+            .header {
+                padding: 0 10px;
+            }
+            .menu-toggle {
+                margin-right: 10px;
+            }
+            .logo {
+                font-size: 18px;
+            }
+            .logo span.logo-text {
+                display: none; /* 小屏只显示TACS渐变 */
+            }
+            .search-wrapper {
+                padding: 0 10px;
+            }
+            .search-box {
+                max-width: 150px;
+            }
+            .container {
+                margin: 15px auto;
+                padding: 0 10px;
+            }
+            .file-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .file-card {
+                padding: 15px;
+            }
+            .section-header h2 {
+                font-size: 20px;
+            }
+            .sidebar {
+                width: 240px;
+                left: -240px;
+            }
+            .sidebar.active { left: 0; }
+            .modal-body {
+                padding: 10px;
+            }
+            .modal-body iframe {
+                min-height: 350px;
+            }
+            .footer-links {
+                gap: 15px;
+            }
         }
     </style>
 </head>
@@ -498,7 +633,7 @@
             <li><a href="#" onclick="navigateTo('about'); toggleMenu(); return false;">关于我们</a></li>
         </ul>
 
-        <!-- 时间显示区域（新增） -->
+        <!-- 时间显示区域 -->
         <div class="time-section">
             <div class="time-label">🕒 世界时间</div>
             <div class="time-city"><span class="city-name">北京时间</span><span id="time-beijing"></span></div>
@@ -530,7 +665,17 @@
         <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
             <span></span><span></span><span></span>
         </div>
-        <div class="logo">TA CS <span>技术社区</span></div>
+        <div class="logo">
+            <span class="logo-gradient">TA CS</span>
+            <span class="logo-text">技术社区</span>
+        </div>
+        <!-- 搜索框 -->
+        <div class="search-wrapper">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索文件..." autocomplete="off">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
     </header>
 
     <div class="breadcrumb" id="breadcrumb">
@@ -595,6 +740,7 @@
         };
 
         let currentSection = localStorage.getItem('ta-cs-current-section') || 'home';
+        let currentFiles = []; // 存储当前板块的文件列表，用于搜索过滤
 
         // ==================== 工具函数 ====================
         function buildApiUrl(path) {
@@ -642,7 +788,7 @@
             document.getElementById('menuToggle').classList.toggle('active');
         }
 
-        // ==================== 时间显示（优化：仅在数字变化时更新） ====================
+        // ==================== 时间显示 ====================
         const timeElements = {
             beijing: document.getElementById('time-beijing'),
             london: document.getElementById('time-london'),
@@ -657,12 +803,7 @@
 
             function formatTime(offsetHours) {
                 const cityTime = new Date(utc + (offsetHours * 3600000));
-                return {
-                    text: `${String(cityTime.getHours()).padStart(2, '0')}:${String(cityTime.getMinutes()).padStart(2, '0')}:${String(cityTime.getSeconds()).padStart(2, '0')}`,
-                    hour: cityTime.getHours(),
-                    minute: cityTime.getMinutes(),
-                    second: cityTime.getSeconds()
-                };
+                return `${String(cityTime.getHours()).padStart(2, '0')}:${String(cityTime.getMinutes()).padStart(2, '0')}:${String(cityTime.getSeconds()).padStart(2, '0')}`;
             }
 
             const times = {
@@ -673,22 +814,41 @@
                 sydney: formatTime(11)
             };
 
-            // 只在显示内容变化时更新 DOM，避免每秒重绘导致抖动
             for (const [key, element] of Object.entries(timeElements)) {
-                if (element) {
-                    const newText = times[key].text;
-                    if (element.textContent !== newText) {
-                        element.textContent = newText;
-                    }
+                if (element && element.textContent !== times[key]) {
+                    element.textContent = times[key];
                 }
             }
         }
+
+        // ==================== 搜索过滤 ====================
+        function filterFiles() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (currentSection === 'about') return; // 关于我们特殊板块无搜索
+            if (!Array.isArray(currentFiles)) return;
+
+            const filtered = currentFiles.filter(file => {
+                const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
+                return displayName.toLowerCase().includes(query);
+            });
+
+            renderFileList(filtered, sectionDefs[currentSection]);
+        }
+
+        // 绑定搜索框事件
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterFiles);
+        });
 
         // ==================== 导航 ====================
         async function navigateTo(sectionKey) {
             currentSection = sectionKey;
             localStorage.setItem('ta-cs-current-section', sectionKey);
             document.getElementById('breadcrumbText').textContent = sectionDefs[sectionKey].title;
+
+            // 清空搜索框
+            document.getElementById('searchInput').value = '';
 
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
@@ -702,6 +862,8 @@
                 if (!Array.isArray(data)) {
                     throw new Error('返回数据格式错误');
                 }
+
+                currentFiles = data;
 
                 if (sectionDefs[sectionKey].special) {
                     renderAboutSection(data);
@@ -717,7 +879,7 @@
         function renderFileList(files, config) {
             const main = document.getElementById('mainContent');
             if (!files || files.length === 0) {
-                main.innerHTML = '<div class="empty">该目录暂无文件</div>';
+                main.innerHTML = '<div class="empty">未找到匹配的文件</div>';
                 return;
             }
 
@@ -740,7 +902,6 @@
 
                 const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
 
-                // 添加 data-path 属性用于目录导航
                 html += '<div class="file-card" data-url="' + escapeHtml(file.download_url) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '" data-path="' + escapeHtml(file.path || '') + '">' +
                     '<div class="file-icon ' + iconClass + '">' + icon + '</div>' +
                     '<div class="file-name">' + escapeHtml(displayName) + '</div>' +
@@ -754,7 +915,6 @@
             html += '</div>';
             main.innerHTML = html;
 
-            // 绑定事件
             main.querySelectorAll('.file-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const url = card.dataset.url;
@@ -788,9 +948,7 @@
                 if (!targetFile) throw new Error('该目录下没有可显示的文件');
 
                 const contentResponse = await fetch(targetFile.download_url);
-                if (!contentResponse.ok) {
-                    throw new Error('读取文件失败 (HTTP ' + contentResponse.status + ')');
-                }
+                if (!contentResponse.ok) throw new Error('读取文件失败 (HTTP ' + contentResponse.status + ')');
                 const content = await contentResponse.text();
                 const ext = targetFile.name.split('.').pop().toLowerCase();
 
@@ -868,15 +1026,13 @@
             const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
-            document.body.classList.add('modal-open'); // 锁定背景滚动
+            document.body.classList.add('modal-open');
             title.textContent = getFileBaseName(name);
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('读取文件失败 (HTTP ' + response.status + ')');
-                }
+                if (!response.ok) throw new Error('读取文件失败 (HTTP ' + response.status + ')');
                 const content = await response.text();
                 const ext = name.split('.').pop().toLowerCase();
 
@@ -901,7 +1057,7 @@
         function closeModal(event) {
             if (!event || event.target === document.getElementById('modalOverlay')) {
                 document.getElementById('modalOverlay').classList.remove('active');
-                document.body.classList.remove('modal-open'); // 解锁背景滚动
+                document.body.classList.remove('modal-open');
             }
         }
 
@@ -953,7 +1109,7 @@
         initTheme();
         navigateTo(currentSection);
         updateWorldTime();
-        setInterval(updateWorldTime, 1000); // 每秒更新，但只在数字变化时修改 DOM
+        setInterval(updateWorldTime, 1000);
     </script>
 </body>
 </html>
