@@ -5,7 +5,487 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TA CS - 技术社区</title>
     <style>
-        /* ... 样式保持不变 ... */
+        /* ========== 基础 ========== */
+        :root {
+            --bg: #f5f6f8;
+            --card-bg: #ffffff;
+            --text: #333;
+            --text-secondary: #666;
+            --border: #e8e8e8;
+            --header-bg: #ffffff;
+            --header-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --footer-bg: #24292e;
+            --footer-text: #fff;
+            --accent: #0052d9;
+            --hover-bg: #f0f7ff;
+            --icon-bg-html: #e8f4fd;
+            --icon-bg-md: #f0f2f5;
+            --icon-bg-txt: #f5f5f5;
+            --icon-bg-json: #e8f8e8;
+            --icon-bg-other: #f5f5f5;
+            --icon-bg-dir: #fff3e0;
+            --code-bg: #f5f5f5;
+            --modal-bg: #ffffff;
+            --modal-overlay: rgba(0,0,0,0.7);
+            --breadcrumb-bg: #fafafa;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #333;
+            --sidebar-hover-bg: #f0f7ff;
+            --sidebar-hover-text: #0052d9;
+        }
+
+        body.dark-mode {
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --text-secondary: #aaaaaa;
+            --border: #444;
+            --header-bg: #2d2d2d;
+            --header-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --footer-bg: #111;
+            --footer-text: #ccc;
+            --accent: #58a6ff;
+            --hover-bg: #3a3a3a;
+            --icon-bg-html: #1e3a5f;
+            --icon-bg-md: #3a3a3a;
+            --icon-bg-txt: #3a3a3a;
+            --icon-bg-json: #1e4d3a;
+            --icon-bg-other: #3a3a3a;
+            --icon-bg-dir: #4d3a1e;
+            --code-bg: #3a3a3a;
+            --modal-bg: #2d2d2d;
+            --modal-overlay: rgba(0,0,0,0.85);
+            --breadcrumb-bg: #222;
+            --sidebar-bg: #2d2d2d;
+            --sidebar-text: #e0e0e0;
+            --sidebar-hover-bg: #3a3a3a;
+            --sidebar-hover-text: #58a6ff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        ul { list-style: none; }
+
+        /* ========== 顶部导航栏 ========== */
+        .header {
+            background-color: var(--header-bg);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: var(--header-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .menu-toggle {
+            cursor: pointer;
+            width: 24px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-right: 20px;
+            transition: transform 0.3s ease;
+        }
+        .menu-toggle.active { transform: rotate(90deg); }
+        .menu-toggle span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background-color: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+        .logo span { color: var(--text); margin-left: 5px; font-weight: 400; font-size: 14px; }
+
+        /* ========== 面包屑 ========== */
+        .breadcrumb {
+            background-color: var(--breadcrumb-bg);
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .breadcrumb strong { color: var(--text); }
+
+        /* ========== 侧边栏 ========== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 260px;
+            height: 100%;
+            background-color: var(--sidebar-bg);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            padding-top: 80px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar ul li { border-bottom: 1px solid var(--border); }
+        .sidebar ul li a,
+        .sidebar ul li .sidebar-link {
+            display: block;
+            padding: 18px 25px;
+            font-size: 16px;
+            color: var(--sidebar-text);
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-align: left;
+            width: 100%;
+        }
+        .sidebar ul li a:hover,
+        .sidebar ul li .sidebar-link:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-hover-text);
+            padding-left: 35px;
+        }
+
+        /* 时间显示区域 */
+        .sidebar .time-section {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar .time-section .time-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .sidebar .time-section .time-city {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text);
+        }
+        .sidebar .time-section .time-city .city-name {
+            color: var(--text-secondary);
+        }
+
+        /* 主题切换区域 */
+        .sidebar .theme-switch-section {
+            margin-top: auto; /* 靠底部 */
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+        }
+        .sidebar .theme-switch-section .theme-switch-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 0 25px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sidebar .theme-switch-section li {
+            border-bottom: none;
+        }
+        .sidebar .theme-switch-section .sidebar-link {
+            padding: 10px 25px;
+            font-size: 14px;
+        }
+        .sidebar .theme-switch-section .sidebar-link:hover {
+            padding-left: 25px;
+            color: var(--sidebar-hover-text);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 900;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .overlay.active { display: block; opacity: 1; }
+
+        /* ========== 主内容 ========== */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 15px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .section-header { margin-bottom: 25px; }
+        .section-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+        .section-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .file-card {
+            background: var(--card-bg);
+            border-radius: 6px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .file-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
+        .file-icon {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .file-icon.html { background: var(--icon-bg-html); color: var(--accent); }
+        .file-icon.md { background: var(--icon-bg-md); color: var(--text); }
+        .file-icon.txt { background: var(--icon-bg-txt); color: var(--text-secondary); }
+        .file-icon.json { background: var(--icon-bg-json); color: #2a6b5a; }
+        .file-icon.other { background: var(--icon-bg-other); color: #999; }
+        .file-icon.dir { background: var(--icon-bg-dir); color: #e65100; }
+
+        .file-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            word-break: break-all;
+        }
+        .file-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .file-type {
+            background: var(--icon-bg-other);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .loading, .error, .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .error { color: #e60012; }
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ========== 模态框（全屏覆盖） ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .modal {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        .modal-header {
+            background: var(--breadcrumb-bg);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            transition: color 0.2s, background 0.2s;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .modal-close:hover {
+            color: var(--text);
+            background: var(--hover-bg);
+        }
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            min-height: 500px;
+        }
+        .modal-body pre {
+            background: var(--code-bg);
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text);
+        }
+        .modal-body .md-content h1 { font-size: 24px; margin: 20px 0 10px; }
+        .modal-body .md-content h2 { font-size: 20px; margin: 15px 0 8px; }
+        .modal-body .md-content h3 { font-size: 16px; margin: 12px 0 6px; }
+        .modal-body .md-content p { margin-bottom: 10px; }
+        .modal-body .md-content code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .modal-body .md-content pre {
+            background: var(--code-bg);
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .modal-body .md-content pre code { background: none; padding: 0; }
+        .modal-body .md-content ul, .modal-body .md-content ol { margin-left: 20px; margin-bottom: 10px; }
+        .modal-body .md-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            color: var(--text-secondary);
+            margin: 10px 0;
+        }
+        .modal-body .md-content a { color: var(--accent); }
+
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 20px 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .footer-link-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--footer-text);
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .footer-link-main:hover { color: var(--accent); transform: scale(1.05); }
+        .github-icon { width: 24px; height: 24px; fill: currentColor; }
+
+        .footer-link-extra {
+            color: #8b949e;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .footer-link-extra:hover { color: var(--accent); }
+
+        .footer-divider { color: #484f58; font-size: 13px; }
+        .footer-copyright { margin-top: 12px; font-size: 11px; color: #6a737d; }
+
+        @media (max-width: 600px) {
+            .file-grid { grid-template-columns: 1fr; }
+            .modal-body iframe { min-height: 350px; }
+            .footer-links { gap: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -19,6 +499,17 @@
             <li><a href="#" onclick="navigateTo('about'); toggleMenu(); return false;">关于我们</a></li>
         </ul>
 
+        <!-- 时间显示区域（新增） -->
+        <div class="time-section">
+            <div class="time-label">🕒 世界时间</div>
+            <div class="time-city"><span class="city-name">北京时间</span><span id="time-beijing"></span></div>
+            <div class="time-city"><span class="city-name">伦敦</span><span id="time-london"></span></div>
+            <div class="time-city"><span class="city-name">纽约</span><span id="time-newyork"></span></div>
+            <div class="time-city"><span class="city-name">东京</span><span id="time-tokyo"></span></div>
+            <div class="time-city"><span class="city-name">悉尼</span><span id="time-sydney"></span></div>
+        </div>
+
+        <!-- 主题切换 -->
         <div class="theme-switch-section">
             <div class="theme-switch-label">主题切换</div>
             <ul>
@@ -49,7 +540,7 @@
 
     <main class="container" id="mainContent"></main>
 
-    <!-- 全屏模态框，关闭按钮为“< 回到上一层” -->
+    <!-- 全屏模态框 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -61,7 +552,23 @@
     </div>
 
     <footer>
-        <!-- 页脚内容保持不变 -->
+        <div class="footer-links">
+            <a href="https://github.com/TACS-Studio" target="_blank" class="footer-link-main">
+                <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+                GitHub 主页
+            </a>
+            <span class="footer-divider">|</span>
+            <a href="https://github.com/TACS-Studio/tacs-pentest-kit" target="_blank" class="footer-link-extra">
+                我的Python工具仓库
+            </a>
+            <span class="footer-divider">|</span>
+            <a href="https://tacs-studio.github.io/" target="_blank" class="footer-link-extra">
+                我的托管仓库
+            </a>
+        </div>
+        <div class="footer-copyright">© 2026 TA CS 技术社区. 托管于 GitHub Pages.</div>
     </footer>
 
     <script>
@@ -136,6 +643,31 @@
             document.getElementById('menuToggle').classList.toggle('active');
         }
 
+        // ==================== 时间显示 ====================
+        function updateWorldTime() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+
+            function setTime(elementId, offsetHours) {
+                const cityTime = new Date(utc + (offsetHours * 3600000));
+                const hours = cityTime.getHours().toString().padStart(2, '0');
+                const minutes = cityTime.getMinutes().toString().padStart(2, '0');
+                const seconds = cityTime.getSeconds().toString().padStart(2, '0');
+                document.getElementById(elementId).textContent = `${hours}:${minutes}:${seconds}`;
+            }
+
+            // 北京时间 UTC+8
+            setTime('time-beijing', 8);
+            // 伦敦 UTC+0（夏令时暂不考虑）
+            setTime('time-london', 0);
+            // 纽约 UTC-5（夏令时暂不考虑）
+            setTime('time-newyork', -5);
+            // 东京 UTC+9
+            setTime('time-tokyo', 9);
+            // 悉尼 UTC+11（夏令时暂不考虑）
+            setTime('time-sydney', 11);
+        }
+
         // ==================== 导航 ====================
         async function navigateTo(sectionKey) {
             currentSection = sectionKey;
@@ -192,7 +724,7 @@
 
                 const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
 
-                // 使用 data-* 属性存储下载链接和文件名，避免内联 onclick 的单引号问题
+                // 使用 data-* 属性存储，避免内联 onclick 的单引号问题
                 html += '<div class="file-card" data-url="' + escapeHtml(file.download_url) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '">' +
                     '<div class="file-icon ' + iconClass + '">' + icon + '</div>' +
                     '<div class="file-name">' + escapeHtml(displayName) + '</div>' +
@@ -206,7 +738,7 @@
             html += '</div>';
             main.innerHTML = html;
 
-            // 事件委托处理点击
+            // 绑定事件
             main.querySelectorAll('.file-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const url = card.dataset.url;
@@ -263,7 +795,6 @@
         function renderSmartText(content) {
             try {
                 const parsed = JSON.parse(content);
-                // 对 JSON 字符串进行转义，防止 XSS
                 return '<pre><code>' + escapeHtml(JSON.stringify(parsed, null, 2)) + '</code></pre>';
             } catch(e) {}
             if (/^#{1,3}\s/m.test(content) || /\*\*.*\*\*/s.test(content) || /^-\s/m.test(content) || /```/.test(content)) {
@@ -320,7 +851,7 @@
             const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
-            title.textContent = getFileBaseName(name);   // 只显示文件名，不含扩展名
+            title.textContent = getFileBaseName(name);
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
@@ -381,7 +912,6 @@
             html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
             html = html.replace(/`(.+?)`/g, '<code>$1</code>');
 
-            // 链接替换（URL 可能包含特殊字符，需要额外处理）
             html = html.replace(/\[(.+?)\]\((.+?)\)/g, function(match, text, url) {
                 return '<a href="' + escapeHtml(url) + '" target="_blank">' + text + '</a>';
             });
@@ -403,6 +933,8 @@
         // ==================== 初始化 ====================
         initTheme();
         navigateTo(currentSection);
+        updateWorldTime();
+        setInterval(updateWorldTime, 1000); // 每秒更新时间
     </script>
 </body>
 </html>
