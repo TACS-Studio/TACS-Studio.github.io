@@ -129,7 +129,6 @@
             white-space: nowrap;
             user-select: none;
         }
-        /* 渐变文字 */
         .logo-gradient {
             background: linear-gradient(135deg, #0052d9 0%, #00a8ff 50%, #0052d9 100%);
             -webkit-background-clip: text;
@@ -183,7 +182,6 @@
             pointer-events: none;
             font-size: 14px;
         }
-        /* 搜索框在移动端隐藏（可通过菜单显示，这里简单处理） */
         @media (max-width: 600px) {
             .search-wrapper {
                 padding: 0 10px;
@@ -192,7 +190,7 @@
                 max-width: 160px;
             }
             .logo span.logo-text {
-                display: none; /* 小屏只显示TACS渐变 */
+                display: none;
             }
         }
 
@@ -456,10 +454,17 @@
             flex-shrink: 0;
             box-shadow: var(--shadow-sm);
         }
+        /* 优化标题过长显示 */
         .modal-title {
             font-size: 18px;
             font-weight: 600;
             color: var(--text);
+            flex: 1;
+            margin-right: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
         }
         .modal-close {
             background: none;
@@ -475,6 +480,7 @@
             align-items: center;
             gap: 4px;
             box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
         }
         .modal-close:hover {
             color: var(--text);
@@ -583,7 +589,7 @@
                 font-size: 18px;
             }
             .logo span.logo-text {
-                display: none; /* 小屏只显示TACS渐变 */
+                display: none;
             }
             .search-wrapper {
                 padding: 0 10px;
@@ -618,6 +624,9 @@
             }
             .footer-links {
                 gap: 15px;
+            }
+            .modal-title {
+                font-size: 16px; /* 手机端标题稍小 */
             }
         }
     </style>
@@ -740,7 +749,7 @@
         };
 
         let currentSection = localStorage.getItem('ta-cs-current-section') || 'home';
-        let currentFiles = []; // 存储当前板块的文件列表，用于搜索过滤
+        let currentFiles = [];
 
         // ==================== 工具函数 ====================
         function buildApiUrl(path) {
@@ -824,7 +833,7 @@
         // ==================== 搜索过滤 ====================
         function filterFiles() {
             const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            if (currentSection === 'about') return; // 关于我们特殊板块无搜索
+            if (currentSection === 'about') return;
             if (!Array.isArray(currentFiles)) return;
 
             const filtered = currentFiles.filter(file => {
@@ -835,7 +844,6 @@
             renderFileList(filtered, sectionDefs[currentSection]);
         }
 
-        // 绑定搜索框事件
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterFiles);
@@ -847,7 +855,6 @@
             localStorage.setItem('ta-cs-current-section', sectionKey);
             document.getElementById('breadcrumbText').textContent = sectionDefs[sectionKey].title;
 
-            // 清空搜索框
             document.getElementById('searchInput').value = '';
 
             const main = document.getElementById('mainContent');
@@ -1028,6 +1035,7 @@
             modal.classList.add('active');
             document.body.classList.add('modal-open');
             title.textContent = getFileBaseName(name);
+            title.title = name; // 悬停显示完整文件名
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
