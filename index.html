@@ -531,25 +531,21 @@
         const REPO = 'TACS-Studio/tacs-studio.github.io';
         const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents';
 
-        // 板块定义：包含关键词和手动候选路径（回退用）
         const sectionDefs = {
             'home': {
                 title: '首页',
                 desc: '欢迎你',
-                keywords: ['网页文件', 'page_html', 'html'],
-                fallbackPaths: ['page_html_网页文件', 'page_html', 'html', 'frontend_/page_html_网页文件']
+                keywords: ['网页文件', 'page_html', 'html']
             },
             'security': {
                 title: '安全文档',
                 desc: '自动识别目录中的安全技术文档，新增文件自动显示',
-                keywords: ['文档', 'backend', 'doc'],
-                fallbackPaths: ['backend_文档', 'backend_文档/文档', '文档', 'backend', 'doc']
+                keywords: ['文档', 'backend', 'doc']
             },
             'about': {
                 title: '关于我们',
                 desc: '关于我们',
                 keywords: ['关于我们', 'about', 'tools', '关于'],
-                fallbackPaths: ['tools_关于我们', 'tools_关于我们/scan_关于我们', '关于我们', 'about', 'tools'],
                 special: true
             }
         };
@@ -619,24 +615,6 @@
             return null;
         }
 
-        // 新增：尝试手动候选路径
-        async function tryFallbackPaths(sectionKey) {
-            const fallbackPaths = sectionDefs[sectionKey].fallbackPaths || [];
-            for (const p of fallbackPaths) {
-                try {
-                    const url = buildApiUrl(p);
-                    const resp = await fetch(url);
-                    if (resp.ok) {
-                        const data = await resp.json();
-                        return { path: p, data: data };
-                    }
-                } catch (e) {
-                    // 继续尝试
-                }
-            }
-            return null;
-        }
-
         async function navigateTo(sectionKey) {
             currentSection = sectionKey;
             localStorage.setItem('ta-cs-current-section', sectionKey);
@@ -646,41 +624,19 @@
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                let targetDir = null;
-                let files = null;
-
-                // 1. 尝试从根目录自动匹配
-                try {
-                    const rootItems = await getRootItems();
-                    targetDir = findDirectoryByKeywords(rootItems, sectionDefs[sectionKey].keywords);
-                    if (targetDir) {
-                        const response = await fetch(buildApiUrl(targetDir.path));
-                        if (response.ok) {
-                            files = await response.json();
-                        } else {
-                            throw new Error('读取目录失败 (HTTP ' + response.status + ')');
-                        }
-                    }
-                } catch (e) {
-                    // 匹配失败或请求失败，继续回退
-                }
-
-                // 2. 如果自动匹配没找到，尝试手动候选路径
-                if (!files) {
-                    const fallbackResult = await tryFallbackPaths(sectionKey);
-                    if (fallbackResult) {
-                        files = fallbackResult.data;
-                        targetDir = { path: fallbackResult.path };
-                    } else {
-                        throw new Error('未找到匹配的文件夹，请检查仓库目录结构');
-                    }
-                }
+                const rootItems = await getRootItems();
+                const targetDir = findDirectoryByKeywords(rootItems, sectionDefs[sectionKey].keywords);
+                if (!targetDir) throw new Error('未找到与“' + sectionDefs[sectionKey].title + '”匹配的文件夹');
 
                 if (sectionDefs[sectionKey].special) {
-                    renderAboutSection(files, targetDir);
-                } else {
-                    renderFileList(files, sectionDefs[sectionKey]);
+                    renderAboutSection(targetDir);
+                    return;
                 }
+
+                const response = await fetch(buildApiUrl(targetDir.path));
+                if (!response.ok) throw new Error('读取目录失败 (HTTP ' + response.status + ')');
+                const files = await response.json();
+                renderFileList(files, sectionDefs[sectionKey]);
             } catch (error) {
                 main.innerHTML = '<div class="error">加载失败: ' + error.message + '</div>';
             }
@@ -730,14 +686,14 @@
             main.innerHTML = html;
         }
 
-        async function renderAboutSection(files, targetDir) {
+        async function renderAboutSection(targetDir) {
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>正在打开关于我们文件...</div>';
 
             try {
-                if (!Array.isArray(files) || files.length === 0) {
-                    throw new Error('目录为空');
-                }
+                const response = await fetch(buildApiUrl(targetDir.path));
+                if (!response.ok) throw new Error('读取目录失败');
+                const files = await response.json();
 
                 let targetFile = null;
                 const htmlFile = files.find(f => f.type === 'file' && /\.(html?)$/i.test(f.name));
