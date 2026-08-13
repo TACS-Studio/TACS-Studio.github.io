@@ -302,7 +302,6 @@
             gap: 25px;
             flex-wrap: wrap;
         }
-        /* GitHub 主链接 - 带猫头图标 */
         .footer-link-main {
             display: inline-flex;
             align-items: center;
@@ -315,7 +314,6 @@
         .footer-link-main:hover { color: #58a6ff; transform: scale(1.05); }
         .github-icon { width: 24px; height: 24px; fill: currentColor; }
 
-        /* 附加链接 - 缩小样式 */
         .footer-link-extra {
             color: #8b949e;
             font-size: 13px;
@@ -386,7 +384,6 @@
     <!-- 页脚 -->
     <footer>
         <div class="footer-links">
-            <!-- GitHub 主页（带猫头图标，主链接） -->
             <a href="https://github.com/TACS-Studio" target="_blank" class="footer-link-main">
                 <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
@@ -396,14 +393,12 @@
 
             <span class="footer-divider">|</span>
 
-            <!-- 我的 Python 工具仓库（缩小样式） -->
             <a href="https://github.com/TACS-Studio/tacs-pentest-kit" target="_blank" class="footer-link-extra">
                 我的Python工具仓库
             </a>
 
             <span class="footer-divider">|</span>
 
-            <!-- 我的托管仓库（缩小样式） -->
             <a href="https://tacs-studio.github.io/" target="_blank" class="footer-link-extra">
                 我的托管仓库
             </a>
@@ -416,23 +411,30 @@
         const REPO = 'TACS-Studio/tacs-studio.github.io';
         const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents';
 
+        // ✅ 修复后的路径：与仓库实际目录一致
         const sections = {
             'home': {
-                path: 'frontend_/page_html_网页文件/',
-                title: '网页文件',
-                desc: '自动识别目录中的网页文件，新增文件自动显示，无需修改 index.html'
+                path: 'page_html_网页文件/',
+                title: '首页',
+                desc: '欢迎你'
             },
             'security': {
-                path: 'backend_文档/文档/',
+                path: 'backend_文档/',
                 title: '安全文档',
                 desc: '自动识别目录中的安全技术文档，新增文件自动显示'
             },
             'about': {
-                path: 'tools_关于我们/scan_关于我们/',
+                path: 'tools_关于我们/',
                 title: '关于我们',
                 desc: '自动识别目录中的团队信息和文档'
             }
         };
+
+        // ✅ 新增：安全构建 GitHub API URL，避免中文路径问题
+        function buildApiUrl(path) {
+            const segments = path.split('/').filter(Boolean).map(seg => encodeURIComponent(seg));
+            return API_BASE + '/' + segments.join('/');
+        }
 
         // === 菜单切换（带旋转动画） ===
         function toggleMenu() {
@@ -457,7 +459,7 @@
                 '<div class="loading"><div class="loading-spinner"></div><br>正在从 GitHub 加载文件列表...</div>';
 
             try {
-                var response = await fetch(API_BASE + '/' + config.path);
+                var response = await fetch(buildApiUrl(config.path));
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status + ': ' + response.statusText);
                 }
@@ -606,6 +608,7 @@
                         body.innerHTML = '<pre><code>' + escapeHtml(content) + '</code></pre>';
                     }
                 } else {
+                    // 包括 .txt、.css、.js、.py 等纯文本文件
                     body.innerHTML = '<pre><code>' + escapeHtml(content) + '</code></pre>';
                 }
             } catch (error) {
@@ -613,7 +616,7 @@
             }
         }
 
-        // === 导航到子目录 ===
+        // === 导航到子目录（预留功能，目前仅提示） ===
         async function navigateDir(path) {
             alert('目录导航: ' + path + '\n\n提示: 当前版本仅支持根目录下的三个固定目录，后续可扩展递归浏览功能。');
         }
