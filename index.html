@@ -63,6 +63,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scrollbar-gutter: stable; } /* 预留滚动条空间，防止抖动 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg);
@@ -74,6 +75,7 @@
             min-height: 100vh;
             transition: background-color 0.3s, color 0.3s;
         }
+        body.modal-open { overflow: hidden; } /* 打开模态框时锁定背景滚动 */
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         ul { list-style: none; }
 
@@ -140,7 +142,7 @@
             background-color: var(--sidebar-bg);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            transition: left 0.3s ease;
+            transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             padding-top: 80px;
             display: flex;
             flex-direction: column;
@@ -195,7 +197,7 @@
 
         /* 主题切换区域 */
         .sidebar .theme-switch-section {
-            margin-top: auto; /* 靠底部 */
+            margin-top: auto;
             padding: 20px 0;
             border-top: 1px solid var(--border);
         }
@@ -341,7 +343,7 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
         }
         .modal-overlay.active {
             opacity: 1;
@@ -356,11 +358,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .modal-overlay.active .modal {
-            transform: translateY(0);
+            transform: none; /* 移除 transform 动画，避免抖动 */
+            transition: none;
         }
         .modal-header {
             background: var(--breadcrumb-bg);
@@ -610,7 +609,7 @@
         }
 
         function formatFileSize(bytes) {
-            if (bytes === undefined || bytes === null) return '';
+            if (bytes === undefined || bytes === null || isNaN(bytes)) return '';
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
@@ -643,29 +642,46 @@
             document.getElementById('menuToggle').classList.toggle('active');
         }
 
-        // ==================== 时间显示 ====================
+        // ==================== 时间显示（优化：仅在数字变化时更新） ====================
+        const timeElements = {
+            beijing: document.getElementById('time-beijing'),
+            london: document.getElementById('time-london'),
+            newyork: document.getElementById('time-newyork'),
+            tokyo: document.getElementById('time-tokyo'),
+            sydney: document.getElementById('time-sydney')
+        };
+
         function updateWorldTime() {
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
 
-            function setTime(elementId, offsetHours) {
+            function formatTime(offsetHours) {
                 const cityTime = new Date(utc + (offsetHours * 3600000));
-                const hours = cityTime.getHours().toString().padStart(2, '0');
-                const minutes = cityTime.getMinutes().toString().padStart(2, '0');
-                const seconds = cityTime.getSeconds().toString().padStart(2, '0');
-                document.getElementById(elementId).textContent = `${hours}:${minutes}:${seconds}`;
+                return {
+                    text: `${String(cityTime.getHours()).padStart(2, '0')}:${String(cityTime.getMinutes()).padStart(2, '0')}:${String(cityTime.getSeconds()).padStart(2, '0')}`,
+                    hour: cityTime.getHours(),
+                    minute: cityTime.getMinutes(),
+                    second: cityTime.getSeconds()
+                };
             }
 
-            // 北京时间 UTC+8
-            setTime('time-beijing', 8);
-            // 伦敦 UTC+0（夏令时暂不考虑）
-            setTime('time-london', 0);
-            // 纽约 UTC-5（夏令时暂不考虑）
-            setTime('time-newyork', -5);
-            // 东京 UTC+9
-            setTime('time-tokyo', 9);
-            // 悉尼 UTC+11（夏令时暂不考虑）
-            setTime('time-sydney', 11);
+            const times = {
+                beijing: formatTime(8),
+                london: formatTime(0),
+                newyork: formatTime(-5),
+                tokyo: formatTime(9),
+                sydney: formatTime(11)
+            };
+
+            // 只在显示内容变化时更新 DOM，避免每秒重绘导致抖动
+            for (const [key, element] of Object.entries(timeElements)) {
+                if (element) {
+                    const newText = times[key].text;
+                    if (element.textContent !== newText) {
+                        element.textContent = newText;
+                    }
+                }
+            }
         }
 
         // ==================== 导航 ====================
@@ -724,8 +740,8 @@
 
                 const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
 
-                // 使用 data-* 属性存储，避免内联 onclick 的单引号问题
-                html += '<div class="file-card" data-url="' + escapeHtml(file.download_url) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '">' +
+                // 添加 data-path 属性用于目录导航
+                html += '<div class="file-card" data-url="' + escapeHtml(file.download_url) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '" data-path="' + escapeHtml(file.path || '') + '">' +
                     '<div class="file-icon ' + iconClass + '">' + icon + '</div>' +
                     '<div class="file-name">' + escapeHtml(displayName) + '</div>' +
                     '<div class="file-meta">' +
@@ -744,10 +760,11 @@
                     const url = card.dataset.url;
                     const name = card.dataset.name;
                     const type = card.dataset.type;
+                    const path = card.dataset.path;
                     if (type === 'file') {
                         openFile(url, name);
                     } else {
-                        navigateDir(card.dataset.path || '');
+                        navigateDir(path);
                     }
                 });
             });
@@ -851,6 +868,7 @@
             const body = document.getElementById('modalBody');
 
             modal.classList.add('active');
+            document.body.classList.add('modal-open'); // 锁定背景滚动
             title.textContent = getFileBaseName(name);
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
@@ -883,6 +901,7 @@
         function closeModal(event) {
             if (!event || event.target === document.getElementById('modalOverlay')) {
                 document.getElementById('modalOverlay').classList.remove('active');
+                document.body.classList.remove('modal-open'); // 解锁背景滚动
             }
         }
 
@@ -934,7 +953,7 @@
         initTheme();
         navigateTo(currentSection);
         updateWorldTime();
-        setInterval(updateWorldTime, 1000); // 每秒更新时间
+        setInterval(updateWorldTime, 1000); // 每秒更新，但只在数字变化时修改 DOM
     </script>
 </body>
 </html>
