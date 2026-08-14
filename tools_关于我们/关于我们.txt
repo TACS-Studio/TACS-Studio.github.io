@@ -1,8 +1,65 @@
 关于我们
- 
 TACS技术社区是面向网络安全、系统内核、漏洞研究与信息技术爱好者的开源技术分享站点。
 我们专注整理公开权威安全资讯、内核漏洞解析、技术文献转载与科普内容，内容均来源于官方公开发布资料，仅作学习交流使用。
- 
+
 本站秉持合规分享、理性研讨的原则，不传播攻击工具、恶意利用代码与违规实操教程，致力于搭建干净纯粹的技术阅读与知识归档平台。
- 
-团队由一众网络安全爱好者自发组建，持续更新安全动态、技术文档、漏洞复盘等内容，欢迎技术同好交流指正。
+
+团队由一众网络安全爱好者自发组建，核心Python工具合集由工作室单人独立开发维护，持续更新安全动态、技术文档、漏洞复盘等内容，欢迎技术同好交流指正。
+
+🛠️ 我的Python工具合集项目介绍
+项目由来
+整套Python安全工具合集为工作室开发者利用课余时间独立编写开发，专门适配手机Termux本地环境，是一套面向网络安全新手的渗透学习工具集合。
+
+本人零基础自学网络安全相关知识，最初只是编写零散Python脚本自我练习，后续逐步整合迭代为完整工具箱。项目稳定保持3~5天一次版本更新，长期目标是完成100个独立功能安全小工具，全程开源免费，仅供圈内同好学习研究。
+
+全权负责开发维护：独立完成全部代码编写、功能迭代、漏洞BUG修复、配套说明文档撰写与合规条款整理，专门优化新手上手难度，严格划定使用边界：工具仅允许在自有设备、自建测试靶场内部学习使用。
+
+项目从十余份零散脚本起步，逐一解决移动端无Root权限、系统沙箱限制、老旧安卓机型兼容等各类适配问题，最终成型为支持一键部署、批量备份、内置错误自检的完整一体化工具包。
+
+📜 版权与许可声明（MIT开源协议）
+本Python工具项目采用 MIT License 开源协议，版权所有 © 2026 TACS工作室。
+
+遵照MIT协议，你可执行以下操作：
+1. 使用：仅限个人网络安全学习，严禁对未授权设备、网站进行探测、入侵等违规操作；
+2. 复制：完整拷贝工具程序与配套文档；
+3. 修改：改写源代码适配自身设备环境；
+4. 分发：对外二次分享转发，但必须完整保留原始版权标识；
+5. 合并：将本项目代码整合进个人学习项目。
+
+强制要求：无论转发、修改、打包分发，代码头部、说明文档内必须完整保留本项目原始版权声明与许可文本。
+
+免责重点：本工具仅作为网络安全教学教具原样提供，不附带任何运行保障。如若使用者私自将工具用于非法扫描、入侵窃取信息等违法行为，全部法律责任由使用者自行承担，开发者不承担任何连带责任。
+
+📧 联系方式
+开发者邮箱：TACS-Studio@outlook.com
+Python工具GitHub项目仓库：https://github.com/TACS-Studio/tacs-pentest-kit
+
+----------------------------------------
+全站整体说明
+本技术社区网站+Python工具工具箱均由TACS工作室统一维护，网站负责安全资讯、漏洞文档归档分享，Python工具集负责实操学习配套，二者相辅相成，全程坚持合规开源、非商用学习导向。
+
+全站最终免责声明
+本站所有文档、工具源码仅用于网络安全技术合法学习交流，严禁任何非法滥用行为，违规操作后果由当事人自行全权负责。
+©2026 TACS技术社区 & TACS工作室
+
+----------------------------------------
+MIT License
+Copyright (c) 2026 TACS-Studio
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
