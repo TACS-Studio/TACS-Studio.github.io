@@ -454,7 +454,6 @@
             flex-shrink: 0;
             box-shadow: var(--shadow-sm);
         }
-        /* 优化标题过长显示 */
         .modal-title {
             font-size: 18px;
             font-weight: 600;
@@ -626,7 +625,7 @@
                 gap: 15px;
             }
             .modal-title {
-                font-size: 16px; /* 手机端标题稍小 */
+                font-size: 16px;
             }
         }
     </style>
@@ -833,7 +832,7 @@
         // ==================== 搜索过滤 ====================
         function filterFiles() {
             const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            if (currentSection === 'about') return;
+            if (currentSection === 'about') return; // 关于我们板块不使用搜索
             if (!Array.isArray(currentFiles)) return;
 
             const filtered = currentFiles.filter(file => {
@@ -909,7 +908,10 @@
 
                 const displayName = file.type === 'dir' ? file.name : getFileBaseName(file.name);
 
-                html += '<div class="file-card" data-url="' + escapeHtml(file.download_url) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '" data-path="' + escapeHtml(file.path || '') + '">' +
+                // 对 download_url 进行编码，避免特殊字符问题
+                const encodedUrl = encodeURI(file.download_url || '');
+
+                html += '<div class="file-card" data-url="' + escapeHtml(encodedUrl) + '" data-name="' + escapeHtml(file.name) + '" data-type="' + file.type + '" data-path="' + escapeHtml(file.path || '') + '">' +
                     '<div class="file-icon ' + iconClass + '">' + icon + '</div>' +
                     '<div class="file-name">' + escapeHtml(displayName) + '</div>' +
                     '<div class="file-meta">' +
@@ -937,7 +939,7 @@
             });
         }
 
-        // ==================== 关于我们特殊渲染 ====================
+        // ==================== 关于我们特殊渲染（修复卡住问题） ====================
         async function renderAboutSection(files) {
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>正在打开关于我们文件...</div>';
@@ -945,6 +947,7 @@
             try {
                 if (!Array.isArray(files) || files.length === 0) throw new Error('目录为空');
 
+                // 选择目标文件
                 let targetFile = null;
                 const htmlFile = files.find(f => f.type === 'file' && /\.(html?)$/i.test(f.name));
                 const mdFile = files.find(f => f.type === 'file' && /\.md$/i.test(f.name));
@@ -953,8 +956,12 @@
 
                 targetFile = htmlFile || mdFile || txtFile || anyFile;
                 if (!targetFile) throw new Error('该目录下没有可显示的文件');
+                if (!targetFile.download_url) throw new Error('文件下载链接无效');
 
-                const contentResponse = await fetch(targetFile.download_url);
+                // 添加超时，避免一直转圈
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('请求超时')), 10000));
+                const contentResponse = await Promise.race([fetch(targetFile.download_url), timeoutPromise]);
+
                 if (!contentResponse.ok) throw new Error('读取文件失败 (HTTP ' + contentResponse.status + ')');
                 const content = await contentResponse.text();
                 const ext = targetFile.name.split('.').pop().toLowerCase();
@@ -1026,20 +1033,26 @@
             return labels[ext] || ext.toUpperCase();
         }
 
-        // ==================== 打开文件（全屏模态框） ====================
+        // ==================== 打开文件（全屏模态框，增加超时与检查） ====================
         async function openFile(url, name) {
             const modal = document.getElementById('modalOverlay');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
 
+            if (!url) {
+                alert('文件链接无效');
+                return;
+            }
+
             modal.classList.add('active');
             document.body.classList.add('modal-open');
             title.textContent = getFileBaseName(name);
-            title.title = name; // 悬停显示完整文件名
+            title.title = name;
             body.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>加载中...</div>';
 
             try {
-                const response = await fetch(url);
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('请求超时')), 10000));
+                const response = await Promise.race([fetch(url), timeoutPromise]);
                 if (!response.ok) throw new Error('读取文件失败 (HTTP ' + response.status + ')');
                 const content = await response.text();
                 const ext = name.split('.').pop().toLowerCase();
