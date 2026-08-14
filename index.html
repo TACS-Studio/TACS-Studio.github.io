@@ -85,6 +85,27 @@
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         ul { list-style: none; }
 
+        /* 全局文本换行，防止溢出 */
+        .container pre,
+        .container .md-content pre,
+        .modal-body pre,
+        .modal-body .md-content pre {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .container .md-content,
+        .modal-body .md-content {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        .container iframe,
+        .modal-body iframe {
+            max-width: 100%;
+        }
+
         /* ========== 顶部导航栏 ========== */
         .header {
             background-color: var(--header-bg);
@@ -627,6 +648,23 @@
             .modal-title {
                 font-size: 16px;
             }
+            /* 移动端文本换行强化 */
+            .container pre,
+            .modal-body pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                overflow-x: hidden;
+                max-width: 100%;
+            }
+            .container .md-content,
+            .modal-body .md-content {
+                word-break: break-word;
+            }
+            .container iframe,
+            .modal-body iframe {
+                height: 60vh;
+                min-height: 300px;
+            }
         }
     </style>
 </head>
@@ -969,7 +1007,7 @@
                 if (['html', 'htm'].includes(ext)) {
                     const blob = new Blob([content], { type: 'text/html' });
                     const blobUrl = URL.createObjectURL(blob);
-                    main.innerHTML = '<iframe src="' + blobUrl + '" style="width:100%; height: calc(100vh - 200px); border: none; border-radius: 6px; background: #fff;"></iframe>';
+                    main.innerHTML = '<iframe src="' + blobUrl + '" class="about-iframe" style="width:100%; border: none; border-radius: 6px; background: #fff;"></iframe>';
                 } else if (ext === 'md') {
                     main.innerHTML = '<div class="md-content">' + renderMarkdown(content) + '</div>';
                 } else {
